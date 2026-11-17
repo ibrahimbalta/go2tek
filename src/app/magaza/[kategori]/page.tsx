@@ -1,8 +1,8 @@
 import React from 'react';
 import Link from 'next/link';
-import { prisma } from '@/lib/prisma';
 import { PRODUCT_CATEGORIES } from '@/lib/constants';
 import { ProductCard } from '@/components/store/ProductCard';
+import { getPublishedProducts } from '@/lib/store-queries';
 import { ShieldCheck, Sparkles, ArrowLeft } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -23,12 +23,8 @@ export default async function CategoryStorePage({
       ? [matchedCat.key]
       : ['NOTEBOOK'];
 
-  const products = await prisma.product.findMany({
-    where: {
-      isPublished: true,
-      category: { in: categoriesFilter },
-    },
-    orderBy: { createdAt: 'desc' },
+  const products = await getPublishedProducts({
+    categories: categoriesFilter,
   });
 
   const pageTitle = matchedCat ? matchedCat.label : 'Kategori Ürünleri';

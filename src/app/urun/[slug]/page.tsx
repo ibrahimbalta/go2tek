@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { prisma } from '@/lib/prisma';
+import { getPublishedProductBySlug } from '@/lib/store-queries';
 import {
   COSMETIC_LABELS,
   INSPECTION_CRITERIA,
@@ -28,11 +28,9 @@ export default async function ProductDetailPage({
 }) {
   const { slug } = await params;
 
-  const product = await prisma.product.findUnique({
-    where: { slug },
-  });
+  const product = await getPublishedProductBySlug(slug);
 
-  if (!product || !product.isPublished) {
+  if (!product) {
     notFound();
   }
 

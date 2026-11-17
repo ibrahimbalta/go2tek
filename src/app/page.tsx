@@ -1,9 +1,9 @@
 import React from 'react';
 import Link from 'next/link';
-import { prisma } from '@/lib/prisma';
 import { ProductCard } from '@/components/store/ProductCard';
 import { HeroSlider } from '@/components/home/HeroSlider';
 import { getHeroSlides, getSiteSettings } from '@/lib/site-config';
+import { getPublishedProducts } from '@/lib/store-queries';
 import {
   Sparkles,
   Tag,
@@ -22,11 +22,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
   const [featuredProducts, heroSlides, siteSettings] = await Promise.all([
-    prisma.product.findMany({
-      where: { isPublished: true },
-      orderBy: { createdAt: 'desc' },
-      take: 8,
-    }),
+    getPublishedProducts({ take: 8 }),
     getHeroSlides(),
     getSiteSettings(),
   ]);
