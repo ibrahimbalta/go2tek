@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 540" fill="none">
+  <rect width="800" height="540" rx="24" fill="#F8FAFC"/>
+  <rect x="290" y="80" width="220" height="370" rx="24" fill="#FFFFFF" stroke="#2563EB" stroke-width="6"/>
+  <rect x="330" y="95" width="140" height="340" rx="14" fill="#0F172A"/>
+  <text x="400" y="255" fill="#FFFFFF" font-family="sans-serif" font-size="24" font-weight="bold" text-anchor="middle">PS5 Slim 1TB</text>
+  <text x="400" y="290" fill="#38BDF8" font-family="sans-serif" font-size="15" font-weight="bold" text-anchor="middle">Çift DualSense Set</text>
+</svg>

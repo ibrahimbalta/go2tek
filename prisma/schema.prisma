@@ -1,0 +1,247 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         String   @default("ADMIN") // ADMIN, SALES_STAFF, TECHNICAL_STAFF, FINANCE_STAFF
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Product {
+  id                    String   @id @default(cuid())
+  slug                  String   @unique
+  sku                   String   @unique
+  title                 String
+  description           String
+  category              String   // NOTEBOOK, TABLET, DESKTOP, MONITOR, PHONE, PARTS, PERIPHERALS, OTHER
+  brand                 String
+  model                 String
+  cpu                   String
+  ram                   String
+  ramGb                 Int      @default(8)
+  storage               String
+  storageGb             Int      @default(256)
+  gpu                   String
+  screenSize            String
+  cosmeticCondition     String   // A_PLUS, A, B, C
+  batteryHealth         String
+  images                String   // JSON string array of image paths/URLs
+  price                 Float
+  stockStatus           String   @default("IN_STOCK") // IN_STOCK, RESERVED, SOLD, OUT_OF_STOCK
+  warrantyInfo          String
+  technicalCheckSummary String
+  inspectionId          String?
+  isPublished           Boolean  @default(true)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  orders StoreOrder[]
+}
+
+model BuyerRequest {
+  id              String   @id @default(cuid())
+  referenceNo     String   @unique
+  category        String   // NOTEBOOK, TABLET, DESKTOP, MONITOR, PHONE, PARTS, PERIPHERALS, OTHER
+  brandPref       String
+  cpuPref         String
+  ramPref         String
+  minRamGb        Int      @default(8)
+  storagePref     String
+  minStorageGb    Int      @default(256)
+  gpuPref         String
+  screenSizePref  String
+  minBudget       Float
+  maxBudget       Float
+  cosmeticPref    String   // A_PLUS, A, B, ANY
+  usagePurpose    String
+  additionalNotes String
+  fullName        String
+  phone           String
+  contactConsent  Boolean  @default(true)
+  kvkkConsent     Boolean  @default(true)
+  status          String   @default("NEW") // NEW, REVIEWING, MATCHED, COMPLETED, CANCELLED
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  transactions MatchTransaction[]
+}
+
+model SellerOffer {
+  id                String   @id @default(cuid())
+  referenceNo       String   @unique
+  category          String
+  brand             String
+  model             String
+  serialNumber      String   // Private - only accessible by authorized staff/admin
+  cpu               String
+  ram               String
+  ramGb             Int      @default(8)
+  storage           String
+  storageGb         Int      @default(256)
+  gpu               String
+  screenSize        String
+  cosmeticCondition String   // A_PLUS, A, B, C
+  batteryHealth     String
+  knownDefects      String
+  photos            String   // JSON string array of uploaded photo paths
+  requestedPrice    Float
+  fullName          String
+  phone             String
+  description       String
+  contactConsent    Boolean  @default(true)
+  kvkkConsent       Boolean  @default(true)
+  status            String   @default("NEW") // NEW, REVIEWING, MATCHED, PURCHASED, REJECTED, CANCELLED
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  transactions MatchTransaction[]
+}
+
+model MatchTransaction {
+  id                String   @id @default(cuid())
+  transactionCode   String   @unique
+  buyerRequestId    String
+  sellerOfferId     String
+  matchScore        Int      @default(0)
+  matchAnalysisJson String   // JSON details of criteria match
+  currentStage      String   @default("NEW_REQUEST")
+  // 15 Mandatory Stages:
+  // 1. NEW_REQUEST (Yeni talep)
+  // 2. MATCH_PROPOSED (Eşleşme önerildi)
+  // 3. BUYER_CONTACTED (Alıcıyla iletişim kuruldu)
+  // 4. BUYER_ACCEPTED (Alıcı kabul etti)
+  // 5. DEPOSIT_PENDING (Kapora bekleniyor)
+  // 6. DEPOSIT_RECEIVED (Kapora alındı)
+  // 7. SELLER_AGREED (Satıcıyla anlaşma sağlandı)
+  // 8. DEVICE_RECEIVED (Cihaz teslim alındı)
+  // 9. INSPECTION_IN_PROGRESS (Teknik kontrol yapılıyor)
+  // 10. INSPECTION_PASSED (Teknik kontrolden geçti)
+  // 11. READY_FOR_SALE (Satışa hazır)
+  // 12. DELIVERED_TO_BUYER (Alıcıya teslim edildi)
+  // 13. COMPLETED (İşlem tamamlandı)
+  // 14. CANCELLED (İptal edildi)
+  // 15. RETURN_DISPUTE (İade/uyuşmazlık sürecinde)
+  assignedUserId    String?
+  assignedUserName  String?
+  adminNotes        String   @default("")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  buyerRequest  BuyerRequest               @relation(fields: [buyerRequestId], references: [id])
+  sellerOffer   SellerOffer                @relation(fields: [sellerOfferId], references: [id])
+  statusHistory TransactionStatusHistory[]
+  inspections   TechnicalInspection[]
+  financials    FinancialLedger?
+}
+
+model TransactionStatusHistory {
+  id              String   @id @default(cuid())
+  transactionId   String
+  fromStage       String?
+  toStage         String
+  changedByUserId String?
+  changedByName   String
+  note            String
+  createdAt       DateTime @default(now())
+
+  transaction MatchTransaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+}
+
+model TechnicalInspection {
+  id                 String   @id @default(cuid())
+  inspectionCode     String   @unique
+  transactionId      String?
+  sellerOfferId      String?
+  productId          String?
+  inspectorUserId    String?
+  inspectorName      String
+  deviceBrandModel   String
+  deviceSerialNumber String
+  // 14 Mandatory Hardware & Cosmetic Tests (PASS | WARNING | FAIL + note JSON or string)
+  screenTest         String   @default("PASS") // 1. Ekran testi
+  keyboardTest       String   @default("PASS") // 2. Klavye testi
+  touchpadTest       String   @default("PASS") // 3. Touchpad testi
+  usbPortsTest       String   @default("PASS") // 4. USB ve bağlantı noktaları
+  wifiTest           String   @default("PASS") // 5. Wi-Fi
+  cameraTest         String   @default("PASS") // 6. Kamera
+  speakerTest        String   @default("PASS") // 7. Hoparlör
+  microphoneTest     String   @default("PASS") // 8. Mikrofon
+  storageHealthTest  String   @default("PASS") // 9. SSD/HDD sağlık durumu
+  ramTest            String   @default("PASS") // 10. RAM testi
+  cpuThermalTest     String   @default("PASS") // 11. İşlemci ve sıcaklık kontrolü
+  batteryHealthTest  String   @default("PASS") // 12. Pil sağlığı
+  chargerAdapterTest String   @default("PASS") // 13. Şarj adaptörü
+  cosmeticCheck      String   @default("PASS") // 14. Kozmetik kontrol
+  testDetailsJson    String   @default("{}")
+  overallStatus      String   @default("PASSED") // PASSED, CONDITIONAL_PASS, FAILED
+  summaryNotes       String
+  photos             String   @default("[]")
+  inspectedAt        DateTime @default(now())
+
+  transaction MatchTransaction? @relation(fields: [transactionId], references: [id], onDelete: SetNull)
+}
+
+model FinancialLedger {
+  id                     String   @id @default(cuid())
+  transactionId          String   @unique
+  sellerPurchasePrice    Float    @default(0) // Satıcıdan alış fiyatı
+  buyerSalePrice         Float    @default(0) // Alıcıya satış fiyatı
+  depositAmount          Float    @default(0) // Alınan kapora
+  depositStatus          String   @default("NOT_PAID") // NOT_PAID, AWAITING_VERIFICATION, VERIFIED_PAID, REFUNDED
+  depositVerificationRef String   @default("")
+  remainingAmount        Float    @default(0) // Kalan ödeme
+  remainingPaymentStatus String   @default("NOT_PAID") // NOT_PAID, VERIFIED_PAID
+  shippingCost           Float    @default(0) // Kargo ve teslimat giderleri
+  inspectionCost         Float    @default(0) // Teknik kontrol giderleri
+  repairCost             Float    @default(0) // Onarım giderleri
+  taxAndOtherCosts       Float    @default(0) // Vergi ve diğer masraflar
+  estimatedGrossProfit   Float    @default(0)
+  estimatedNetProfit     Float    @default(0)
+  actualGrossProfit      Float    @default(0)
+  actualNetProfit        Float    @default(0)
+  updatedAt              DateTime @updatedAt
+
+  transaction MatchTransaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+}
+
+model StoreOrder {
+  id               String   @id @default(cuid())
+  orderNo          String   @unique
+  productId        String
+  customerName     String
+  customerPhone    String
+  customerEmail    String
+  shippingAddress  String
+  amount           Float
+  paymentMethod    String   // PAYMENT_GATEWAY_IYZICO, BANK_TRANSFER_EFT
+  paymentStatus    String   @default("PENDING_VERIFICATION") // GATEWAY_NOT_CONFIGURED, PENDING_VERIFICATION, VERIFIED_PAID, CANCELLED
+  gatewayReference String   @default("")
+  notes            String   @default("")
+  createdAt        DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  userEmail  String
+  userRole   String
+  action     String
+  entityType String
+  entityId   String
+  details    String
+  ipAddress  String   @default("127.0.0.1")
+  createdAt  DateTime @default(now())
+}

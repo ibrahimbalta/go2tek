@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 540" fill="none">
+  <rect width="800" height="540" rx="24" fill="#F8FAFC"/>
+  <rect x="220" y="75" width="360" height="390" rx="28" fill="#0F172A" stroke="#334155" stroke-width="8"/>
+  <rect x="238" y="95" width="324" height="350" rx="16" fill="url(#ipadGrad)"/>
+  <text x="400" y="245" fill="#FFFFFF" font-family="sans-serif" font-size="28" font-weight="bold" text-anchor="middle">iPad Pro 12.9"</text>
+  <text x="400" y="285" fill="#38BDF8" font-family="sans-serif" font-size="18" font-weight="bold" text-anchor="middle">M2 Çip • 256GB • Liquid Retina XDR</text>
+  <defs>
+    <linearGradient id="ipadGrad" x1="238" y1="95" x2="562" y2="445" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0F172A"/>
+      <stop offset="0.5" stop-color="#1E3A8A"/>
+      <stop offset="1" stop-color="#2563EB"/>
+    </linearGradient>
+  </defs>
+</svg>
