@@ -188,47 +188,34 @@ export const DEFAULT_HERO_SLIDES: HeroSlideData[] = [
   },
 ];
 
-async function ensureConfigTable() {
-  await prisma.$executeRawUnsafe(`
-    CREATE TABLE IF NOT EXISTS SiteConfig (
-      key TEXT PRIMARY KEY,
-      valueJson TEXT NOT NULL,
-      updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-}
-
 export async function getSiteSettings(): Promise<SiteSettingsData> {
   try {
-    await ensureConfigTable();
-    const rows = await prisma.$queryRawUnsafe<Array<{ valueJson: string }>>(
-      `SELECT valueJson FROM SiteConfig WHERE key = 'site_settings' LIMIT 1`
-    );
-    if (!rows || rows.length === 0) return DEFAULT_SITE_SETTINGS;
-    return { ...DEFAULT_SITE_SETTINGS, ...JSON.parse(rows[0].valueJson) };
+    const row = await prisma.siteConfig.findUnique({
+      where: { key: 'site_settings' },
+    });
+    if (!row) return DEFAULT_SITE_SETTINGS;
+    return { ...DEFAULT_SITE_SETTINGS, ...JSON.parse(row.valueJson) };
   } catch {
     return DEFAULT_SITE_SETTINGS;
   }
 }
 
 export async function saveSiteSettings(settings: SiteSettingsData): Promise<void> {
-  await ensureConfigTable();
   const json = JSON.stringify(settings);
-  await prisma.$executeRawUnsafe(
-    `INSERT INTO SiteConfig (key, valueJson, updatedAt) VALUES ('site_settings', ?, CURRENT_TIMESTAMP)
-     ON CONFLICT(key) DO UPDATE SET valueJson = excluded.valueJson, updatedAt = CURRENT_TIMESTAMP`,
-    json
-  );
+  await prisma.siteConfig.upsert({
+    where: { key: 'site_settings' },
+    create: { key: 'site_settings', valueJson: json },
+    update: { valueJson: json },
+  });
 }
 
 export async function getHeroSlides(): Promise<HeroSlideData[]> {
   try {
-    await ensureConfigTable();
-    const rows = await prisma.$queryRawUnsafe<Array<{ valueJson: string }>>(
-      `SELECT valueJson FROM SiteConfig WHERE key = 'hero_slides' LIMIT 1`
-    );
-    if (!rows || rows.length === 0) return DEFAULT_HERO_SLIDES;
-    const parsed = JSON.parse(rows[0].valueJson);
+    const row = await prisma.siteConfig.findUnique({
+      where: { key: 'hero_slides' },
+    });
+    if (!row) return DEFAULT_HERO_SLIDES;
+    const parsed = JSON.parse(row.valueJson);
     return Array.isArray(parsed) && parsed.length > 0
       ? parsed
       : DEFAULT_HERO_SLIDES;
@@ -238,11 +225,10 @@ export async function getHeroSlides(): Promise<HeroSlideData[]> {
 }
 
 export async function saveHeroSlides(slides: HeroSlideData[]): Promise<void> {
-  await ensureConfigTable();
   const json = JSON.stringify(slides);
-  await prisma.$executeRawUnsafe(
-    `INSERT INTO SiteConfig (key, valueJson, updatedAt) VALUES ('hero_slides', ?, CURRENT_TIMESTAMP)
-     ON CONFLICT(key) DO UPDATE SET valueJson = excluded.valueJson, updatedAt = CURRENT_TIMESTAMP`,
-    json
-  );
+  await prisma.siteConfig.upsert({
+    where: { key: 'hero_slides' },
+    create: { key: 'hero_slides', valueJson: json },
+    update: { valueJson: json },
+  });
 }
