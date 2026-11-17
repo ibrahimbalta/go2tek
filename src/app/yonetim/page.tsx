@@ -122,7 +122,7 @@ export default function AdminDashboardPage() {
     try {
       const res = await fetch('/api/admin/overview');
       if (res.status === 401) {
-        router.push('/yonetim/giris');
+        router.push('/');
         return;
       }
       const json = await res.json();
@@ -175,7 +175,7 @@ export default function AdminDashboardPage() {
 
   async function handleLogout() {
     await fetch('/api/auth/logout', { method: 'POST' });
-    router.push('/yonetim/giris');
+    router.push('/g2t-portal-x94k');
   }
 
   async function handleCreateMatch(buyerRequestId: string, sellerOfferId: string, note?: string) {

@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { Go2TekLogo } from './Go2TekLogo';
 import { getSiteSettings } from '@/lib/site-config';
@@ -202,13 +202,6 @@ export async function Footer() {
                 className="hover:text-white transition"
               >
                 Mesafeli Satış Sözleşmesi ve İade Koşulları
-              </Link>
-              <Link
-                href="/yonetim"
-                className="inline-flex items-center gap-1 text-zinc-500 hover:text-red-400 transition mt-1"
-              >
-                <Lock className="w-3 h-3" />
-                Go2Tek Yönetim & Personel Girişi
               </Link>
             </div>
           </div>

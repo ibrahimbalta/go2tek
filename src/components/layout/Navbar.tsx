@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState } from 'react';
 import Link from 'next/link';
@@ -89,13 +89,6 @@ export function Navbar({
                 className="hidden sm:inline text-red-50 hover:text-white transition"
               >
                 İletişim
-              </Link>
-              <Link
-                href="/yonetim"
-                className="inline-flex items-center gap-1 text-red-100 hover:text-white transition"
-              >
-                <Lock className="w-3 h-3" />
-                <span>Yönetim</span>
               </Link>
             </div>
           </div>

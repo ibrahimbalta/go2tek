@@ -16,7 +16,8 @@ export function SiteChrome({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const isAdmin = pathname.startsWith('/yonetim');
+  const isAdmin =
+    pathname.startsWith('/yonetim') || pathname.startsWith('/g2t-portal-x94k');
 
   return (
     <>
