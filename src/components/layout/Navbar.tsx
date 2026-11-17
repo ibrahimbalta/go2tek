@@ -12,7 +12,6 @@ import {
   Tag,
   Menu,
   X,
-  Lock,
   FileSearch,
   ShoppingBag,
   Phone,
@@ -46,31 +45,35 @@ export function Navbar({
   const navCategories = [
     { href: '/magaza', label: 'Tüm Ürünler' },
     { href: '/magaza/notebook', label: '2.El Notebook' },
-    { href: '/magaza/masaustu-bilgisayar', label: 'Masaüstü Bilgisayar' },
+    { href: '/magaza/masaustu-bilgisayar', label: 'Masaüstü PC' },
     { href: '/magaza/telefon', label: '2.El Telefon' },
     { href: '/magaza/tablet', label: '2.El Tablet' },
-    { href: '/magaza/diger-elektronik', label: 'Monitör, Parça & Aksesuar' },
+    { href: '/magaza/diger-elektronik', label: 'Monitör & Aksesuar' },
   ];
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-zinc-200/80">
-        {/* Clean, Light-Red Tinted Top Utility Bar */}
-        <div className="bg-red-600 text-white text-xs py-2 px-4">
-          <div className="max-w-7xl mx-auto flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <span className="inline-flex items-center gap-1.5 font-semibold">
-                <ShieldCheck className="w-3.5 h-3.5 text-white" />
-                {topBarText}
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-zinc-200/80 shadow-2xs">
+        {/* Symmetrical Top Utility Bar */}
+        <div className="bg-red-600 text-white text-[11px] sm:text-xs py-2 px-4">
+          <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
+            <div className="flex items-center gap-3 min-w-0">
+              <span className="inline-flex items-center gap-1.5 font-semibold truncate">
+                <ShieldCheck className="w-3.5 h-3.5 text-white shrink-0" />
+                <span className="sm:hidden">Alım • Satım • Takas</span>
+                <span className="hidden sm:inline">{topBarText}</span>
               </span>
               <span className="hidden md:inline text-red-300">|</span>
-              <span className="hidden md:inline-flex items-center gap-1.5 text-red-50 font-medium">
+              <a
+                href={`tel:${phone.replace(/[^\d+]/g, '')}`}
+                className="hidden md:inline-flex items-center gap-1.5 text-red-50 hover:text-white font-medium shrink-0"
+              >
                 <Phone className="w-3 h-3 text-white" />
                 {phone}
-              </span>
+              </a>
             </div>
 
-            <div className="flex items-center gap-5 font-medium">
+            <div className="flex items-center gap-4 sm:gap-5 font-medium shrink-0">
               <Link
                 href="/basvuru-sorgula"
                 className="inline-flex items-center gap-1 text-white hover:text-red-100 transition"
@@ -94,13 +97,13 @@ export function Navbar({
           </div>
         </div>
 
-        {/* Main Header Row: Logo + Clean Search + Clear Actions */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-6">
+        {/* Main Header Row */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-3 sm:gap-6">
           <Link href="/" className="shrink-0">
             <Go2TekLogo variant="light" size="md" />
           </Link>
 
-          {/* Clean Central Search Bar */}
+          {/* Desktop Search Bar */}
           <form
             onSubmit={handleSearchSubmit}
             className="hidden md:flex flex-1 max-w-lg relative"
@@ -122,7 +125,7 @@ export function Navbar({
           </form>
 
           {/* Right Action Buttons */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2 sm:gap-2.5">
             <Link
               href="/butceme-gore-cihaz-bul"
               className="hidden lg:inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-red-600 hover:bg-red-700 text-white text-xs font-semibold shadow-xs transition"
@@ -143,7 +146,7 @@ export function Navbar({
             <button
               type="button"
               onClick={openCart}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full border border-zinc-200 hover:border-zinc-300 bg-white text-zinc-800 text-xs font-semibold transition"
+              className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-full border border-zinc-200 hover:border-zinc-300 bg-white text-zinc-800 text-xs font-semibold transition"
               aria-label="Sepetim"
             >
               <ShoppingBag className="w-4 h-4 text-red-600" />
@@ -158,7 +161,7 @@ export function Navbar({
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2.5 rounded-xl border border-zinc-200 text-zinc-700 hover:bg-zinc-100"
+              className="lg:hidden p-2 rounded-xl border border-zinc-200 text-zinc-700 hover:bg-zinc-100 transition"
               aria-label="Menü"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -166,20 +169,40 @@ export function Navbar({
           </div>
         </div>
 
-        {/* Clean Category Bar */}
+        {/* Always-Visible Mobile Search Bar */}
+        <div className="md:hidden px-4 pb-3">
+          <form onSubmit={handleSearchSubmit} className="relative">
+            <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Notebook, PC, Telefon, Tablet ara..."
+              className="w-full pl-10 pr-16 py-2.5 rounded-full border border-zinc-200 bg-zinc-50 focus:bg-white focus:border-red-600 text-xs text-zinc-900 focus:outline-none"
+            />
+            <button
+              type="submit"
+              className="absolute right-1 top-1 bottom-1 px-4 rounded-full bg-red-600 text-white text-xs font-semibold"
+            >
+              Ara
+            </button>
+          </form>
+        </div>
+
+        {/* Symmetrical Category Bar (Pills on Mobile, Clean Tabs on Desktop) */}
         <div className="border-t border-zinc-100 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-11 overflow-x-auto no-scrollbar">
-            <nav className="flex items-center gap-6">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between py-2 md:py-0 md:h-11 overflow-x-auto no-scrollbar">
+            <nav className="flex items-center gap-2 md:gap-6">
               {navCategories.map((item) => {
                 const active = pathname === item.href;
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`text-xs sm:text-[13px] font-semibold whitespace-nowrap py-2.5 border-b-2 transition ${
+                    className={`text-xs sm:text-[13px] font-semibold whitespace-nowrap transition md:py-2.5 md:border-b-2 md:rounded-none md:bg-transparent px-3.5 py-1.5 rounded-full ${
                       active
-                        ? 'border-red-600 text-red-600'
-                        : 'border-transparent text-zinc-600 hover:text-zinc-900'
+                        ? 'bg-red-600 text-white md:bg-transparent md:border-red-600 md:text-red-600'
+                        : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200 md:border-transparent md:text-zinc-600 md:hover:text-zinc-900'
                     }`}
                   >
                     {item.label}
@@ -188,71 +211,87 @@ export function Navbar({
               })}
             </nav>
 
-            <span className="hidden xl:inline text-xs text-zinc-400 font-medium">
+            <span className="hidden xl:inline text-xs text-zinc-400 font-medium shrink-0">
               2.El Bilgisayar • Notebook • Telefon • Tablet • Aksesuar
             </span>
           </div>
         </div>
 
-        {/* Mobile Drawer */}
+        {/* Symmetrical Mobile Drawer */}
         {mobileMenuOpen && (
           <div className="lg:hidden border-t border-zinc-200 bg-white px-4 py-4 space-y-4 shadow-xl">
-            <form onSubmit={handleSearchSubmit} className="relative">
-              <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Ürün veya model ara..."
-                className="w-full pl-10 pr-16 py-2.5 rounded-xl border border-zinc-200 bg-zinc-50 text-xs"
-              />
-              <button
-                type="submit"
-                className="absolute right-1.5 top-1.5 bottom-1.5 px-3 rounded-lg bg-red-600 text-white text-xs font-semibold"
-              >
-                Ara
-              </button>
-            </form>
-
             <div className="grid grid-cols-2 gap-2">
-              {navCategories.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="px-3 py-2.5 rounded-xl bg-zinc-50 hover:bg-zinc-100 text-xs font-semibold text-zinc-800"
-                >
-                  {item.label}
-                </Link>
-              ))}
+              {navCategories.map((item) => {
+                const active = pathname === item.href;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`px-3 py-2.5 rounded-xl text-center text-xs font-semibold transition ${
+                      active
+                        ? 'bg-red-600 text-white'
+                        : 'bg-zinc-50 hover:bg-zinc-100 text-zinc-800 border border-zinc-200/70'
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
             </div>
 
-            <div className="grid grid-cols-1 gap-2 pt-2 border-t border-zinc-100">
+            <div className="grid grid-cols-2 gap-2 pt-2 border-t border-zinc-100">
               <Link
                 href="/butceme-gore-cihaz-bul"
                 onClick={() => setMobileMenuOpen(false)}
-                className="w-full py-3 rounded-xl bg-red-600 text-white text-center text-xs font-semibold"
+                className="py-3 px-2 rounded-xl bg-red-600 text-white text-center text-xs font-semibold flex items-center justify-center gap-1.5"
               >
-                Bütçeme Göre Cihaz Bul
+                <Sparkles className="w-3.5 h-3.5 shrink-0" />
+                <span>Cihaz Bul</span>
               </Link>
               <Link
                 href="/cihazimi-satmak-istiyorum"
                 onClick={() => setMobileMenuOpen(false)}
-                className="w-full py-3 rounded-xl bg-zinc-900 text-white text-center text-xs font-semibold"
+                className="py-3 px-2 rounded-xl bg-zinc-900 text-white text-center text-xs font-semibold flex items-center justify-center gap-1.5"
               >
-                Cihazımı Satmak İstiyorum
+                <Tag className="w-3.5 h-3.5 text-red-400 shrink-0" />
+                <span>Cihazımı Sat</span>
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 pt-2 border-t border-zinc-100 text-center">
+              <Link
+                href="/basvuru-sorgula"
+                onClick={() => setMobileMenuOpen(false)}
+                className="py-2 rounded-lg bg-zinc-50 text-zinc-700 text-[11px] font-semibold"
+              >
+                Başvuru Sorgula
+              </Link>
+              <Link
+                href="/hakkimizda"
+                onClick={() => setMobileMenuOpen(false)}
+                className="py-2 rounded-lg bg-zinc-50 text-zinc-700 text-[11px] font-semibold"
+              >
+                Hakkımızda
+              </Link>
+              <Link
+                href="/iletisim"
+                onClick={() => setMobileMenuOpen(false)}
+                className="py-2 rounded-lg bg-zinc-50 text-zinc-700 text-[11px] font-semibold"
+              >
+                İletişim
               </Link>
             </div>
           </div>
         )}
       </header>
 
-      {/* Mobile Bottom Navigation */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-zinc-200 shadow-lg px-2 py-1.5 grid grid-cols-5 gap-1">
+      {/* Symmetrical Mobile Bottom Navigation */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-zinc-200 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] px-2 py-1.5 grid grid-cols-5 items-center gap-1">
         <Link
           href="/"
-          className={`flex flex-col items-center justify-center py-1 text-[10px] font-semibold ${
-            pathname === '/' ? 'text-red-600' : 'text-zinc-500'
+          className={`flex flex-col items-center justify-center h-12 rounded-xl text-[10px] font-semibold transition ${
+            pathname === '/' ? 'text-red-600 bg-red-50/70' : 'text-zinc-500'
           }`}
         >
           <Home className="w-4 h-4 mb-0.5" />
@@ -260,8 +299,10 @@ export function Navbar({
         </Link>
         <Link
           href="/magaza"
-          className={`flex flex-col items-center justify-center py-1 text-[10px] font-semibold ${
-            pathname.startsWith('/magaza') ? 'text-red-600' : 'text-zinc-500'
+          className={`flex flex-col items-center justify-center h-12 rounded-xl text-[10px] font-semibold transition ${
+            pathname.startsWith('/magaza')
+              ? 'text-red-600 bg-red-50/70'
+              : 'text-zinc-500'
           }`}
         >
           <LayoutGrid className="w-4 h-4 mb-0.5" />
@@ -269,16 +310,16 @@ export function Navbar({
         </Link>
         <Link
           href="/butceme-gore-cihaz-bul"
-          className="flex flex-col items-center justify-center py-1 rounded-xl bg-red-600 text-white text-[10px] font-semibold"
+          className="flex flex-col items-center justify-center h-12 rounded-xl bg-red-600 text-white text-[10px] font-semibold shadow-sm"
         >
           <Sparkles className="w-4 h-4 mb-0.5" />
           <span>Cihaz Bul</span>
         </Link>
         <Link
           href="/cihazimi-satmak-istiyorum"
-          className={`flex flex-col items-center justify-center py-1 text-[10px] font-semibold ${
+          className={`flex flex-col items-center justify-center h-12 rounded-xl text-[10px] font-semibold transition ${
             pathname === '/cihazimi-satmak-istiyorum'
-              ? 'text-red-600'
+              ? 'text-red-600 bg-red-50/70'
               : 'text-zinc-500'
           }`}
         >
@@ -288,7 +329,7 @@ export function Navbar({
         <button
           type="button"
           onClick={openCart}
-          className="flex flex-col items-center justify-center py-1 text-[10px] font-semibold text-zinc-600"
+          className="flex flex-col items-center justify-center h-12 rounded-xl text-[10px] font-semibold text-zinc-600 relative"
         >
           <ShoppingBag className="w-4 h-4 mb-0.5 text-red-600" />
           <span>Sepet ({items.length})</span>
@@ -297,4 +338,3 @@ export function Navbar({
     </>
   );
 }
-

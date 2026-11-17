@@ -195,7 +195,8 @@ export function HeroSlider({
         <div className="absolute -top-28 -right-28 w-96 h-96 rounded-full bg-red-500/10 blur-3xl pointer-events-none" />
         <div className="absolute -bottom-24 -left-24 w-80 h-80 rounded-full bg-red-600/5 blur-3xl pointer-events-none" />
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center p-6 sm:p-10 lg:p-12 relative z-10">
+        {/* Main Slide Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center p-5 sm:p-10 lg:p-12 relative z-10">
           {/* Left Column */}
           <div className="lg:col-span-7 space-y-5">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-red-600 text-white text-xs font-bold tracking-wide shadow-xs">
@@ -203,7 +204,7 @@ export function HeroSlider({
               <span>{slide.badge}</span>
             </div>
 
-            <h1 className="text-2xl sm:text-4xl lg:text-[40px] font-black text-zinc-900 tracking-tight leading-[1.15]">
+            <h1 className="text-2xl sm:text-4xl lg:text-[40px] font-black text-zinc-900 tracking-tight leading-[1.18]">
               {slide.titlePrefix}
               <span className="text-red-600">{slide.titleHighlight}</span>
               {slide.titleSuffix}
@@ -225,17 +226,18 @@ export function HeroSlider({
               ))}
             </div>
 
-            <div className="pt-2 flex flex-wrap items-center gap-3">
+            {/* Action Buttons (Symmetrical on Mobile) */}
+            <div className="pt-2 grid grid-cols-1 sm:flex sm:flex-wrap items-center gap-2.5 sm:gap-3">
               <Link
                 href={slide.primaryCta.href}
-                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-red-600 hover:bg-red-700 text-white text-sm font-bold shadow-md shadow-red-600/20 transition"
+                className="inline-flex items-center justify-center gap-2 px-6 sm:px-7 py-3.5 rounded-full bg-red-600 hover:bg-red-700 text-white text-sm font-bold shadow-md shadow-red-600/20 transition"
               >
                 {slide.primaryCta.label}
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
                 href={slide.secondaryCta.href}
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-white hover:bg-zinc-50 text-zinc-800 border border-zinc-300 text-sm font-bold transition shadow-2xs"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-white hover:bg-zinc-50 text-zinc-800 border border-zinc-300 text-sm font-bold transition shadow-2xs"
               >
                 {slide.secondaryCta.label}
               </Link>
