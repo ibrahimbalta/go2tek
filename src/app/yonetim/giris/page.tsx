@@ -46,13 +46,13 @@ export default function AdminLoginPage() {
     <div className="max-w-md mx-auto px-4 py-16">
       <div className="bg-white rounded-3xl border border-slate-200 p-8 shadow-xl space-y-6">
         <div className="text-center space-y-2">
-          <div className="w-14 h-14 rounded-2xl bg-slate-900 text-white flex items-center justify-center mx-auto">
-            <Lock className="w-7 h-7 text-blue-400" />
+          <div className="w-14 h-14 rounded-2xl bg-red-600 text-white flex items-center justify-center mx-auto shadow-md shadow-red-600/25">
+            <Lock className="w-7 h-7 text-white" />
           </div>
-          <h1 className="text-2xl font-black text-slate-900">
+          <h1 className="text-2xl font-black text-zinc-900">
             Go2Tek Yönetim Merkezi
           </h1>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-zinc-500">
             Yetkili Yönetici ve Personel Kimlik Doğrulama Sistemi
           </p>
         </div>
@@ -94,7 +94,7 @@ export default function AdminLoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-lg shadow-blue-600/20 transition"
+            className="w-full py-3.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-extrabold shadow-lg shadow-red-600/20 transition"
           >
             {loading ? 'Doğrulanıyor...' : 'Yönetim Paneline Giriş Yap'}
           </button>

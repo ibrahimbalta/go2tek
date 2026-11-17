@@ -385,9 +385,9 @@ export default function AdminDashboardPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       {/* Top Admin Header */}
-      <div className="bg-slate-900 text-white rounded-3xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-zinc-900 text-white rounded-3xl p-6 border-b-4 border-red-600 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <span className="text-xs font-bold uppercase tracking-wider text-blue-400">
+          <span className="text-xs font-extrabold uppercase tracking-wider text-red-500">
             Go2Tek Kapalı Devre Yönetim & Eşleştirme Merkezi
           </span>
           <h1 className="text-2xl font-black mt-0.5">
@@ -420,10 +420,10 @@ export default function AdminDashboardPage() {
                 setActiveTab(tab.key);
                 setFeedback(null);
               }}
-              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition ${
+              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition ${
                 active
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100'
+                  ? 'bg-red-600 text-white shadow-sm'
+                  : 'bg-white border border-zinc-200 text-zinc-700 hover:bg-red-50 hover:border-red-400'
               }`}
             >
               <Icon className="w-4 h-4" />

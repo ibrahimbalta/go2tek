@@ -119,14 +119,13 @@ async function main() {
       cosmeticCondition: 'A_PLUS',
       batteryHealth: '%96 (64 Döngü)',
       images: JSON.stringify([
-        '/images/products/macbook-pro-14.svg',
-        '/images/products/macbook-pro-14-side.svg',
+        'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=900&q=85',
       ]),
       price: 58900,
       stockStatus: 'IN_STOCK',
-      warrantyInfo: '6 Ay Go2Tek Kurumsal Donanım Garantisi + 10 Ay Apple Türkiye Garantisi',
+      warrantyInfo: 'Devam Eden Apple Garantisi (10 Ay) • Mağaza Kontrolü Yapılmış',
       technicalCheckSummary:
-        'Ekran, klavye, touchpad, Thunderbolt 4 portları, SSD (%99 sağlık) ve termal stres testi eksiksiz onaylandı.',
+        'Ekran, klavye, touchpad, bağlantı portları ve şarj durumu mağazamızda kontrol edilmiştir.',
       inspectionId: insp1.id,
       isPublished: true,
     },
@@ -148,12 +147,14 @@ async function main() {
       screenSize: '16.0" FHD+ 165Hz %100 sRGB G-Sync',
       cosmeticCondition: 'A',
       batteryHealth: '%91 (Orijinal 90Wh Batarya)',
-      images: JSON.stringify(['/images/products/asus-rog-g16.svg']),
+      images: JSON.stringify([
+        'https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=900&q=85',
+      ]),
       price: 47500,
       stockStatus: 'IN_STOCK',
-      warrantyInfo: '12 Ay ASUS Türkiye + Go2Tek Teknik Güvence Sertifikası',
+      warrantyInfo: 'Devam Eden ASUS Türkiye Garantisi • Mağaza Kontrolü Yapılmış',
       technicalCheckSummary:
-        '30 dakikalık FurMark ve Cinebench R23 stres testinde maksimum 78°C CPU, 71°C GPU sıcaklığı ölçüldü. Tüm portlar ve RGB klavye kusursuz.',
+        'Genel çalışma, fan/soğutma, ekran, klavye ve port kontrolleri mağazamızda yapılmıştır.',
       isPublished: true,
     },
     {
@@ -174,12 +175,14 @@ async function main() {
       screenSize: '14.0" WUXGA (1920x1200) IPS Mat',
       cosmeticCondition: 'A_PLUS',
       batteryHealth: '%93 (Orijinal 57Wh)',
-      images: JSON.stringify(['/images/products/thinkpad-x1.svg']),
+      images: JSON.stringify([
+        'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?auto=format&fit=crop&w=900&q=85',
+      ]),
       price: 36900,
       stockStatus: 'IN_STOCK',
-      warrantyInfo: '6 Ay Go2Tek Kurumsal Garanti',
+      warrantyInfo: 'Mağaza Kontrolü Yapılmış • Teslimat Kontrol Güvenceli',
       technicalCheckSummary:
-        'Menteşe sertliği, TrackPoint, parmak izi okuyucu, Thunderbolt 4 portları ve NVMe sağlık (%98) testi başarılı.',
+        'Menteşe, klavye, ekran, batarya ve genel çalışma kontrolleri mağazamızda yapılmıştır.',
       isPublished: true,
     },
     {
@@ -200,12 +203,14 @@ async function main() {
       screenSize: '12.9" Liquid Retina XDR ProMotion 120Hz',
       cosmeticCondition: 'A_PLUS',
       batteryHealth: '%98 (29 Döngü)',
-      images: JSON.stringify(['/images/products/ipad-pro-m2.svg']),
+      images: JSON.stringify([
+        'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=900&q=85',
+      ]),
       price: 33500,
       stockStatus: 'IN_STOCK',
-      warrantyInfo: '8 Ay Apple Garantisi + 6 Ay Go2Tek Güvencesi',
+      warrantyInfo: 'Devam Eden Apple Garantisi (8 Ay) • Mağaza Kontrolü Yapılmış',
       technicalCheckSummary:
-        'TrueDepth FaceID, dörtlü hoparlör, Apple Pencil 2 manyetik şarj ve dokunmatik hassasiyet testlerinden tam not aldı.',
+        'Ekran dokunmatiği, FaceID, hoparlör ve şarj soketi kontrolleri mağazamızda yapılmıştır.',
       isPublished: true,
     },
     {
@@ -226,7 +231,9 @@ async function main() {
       screenSize: '14.6" Dynamic AMOLED 2X 120Hz',
       cosmeticCondition: 'A_PLUS',
       batteryHealth: '%97 (11200 mAh)',
-      images: JSON.stringify(['/images/products/tab-s9-ultra.svg']),
+      images: JSON.stringify([
+        'https://images.unsplash.com/photo-1585790050230-5dd28404ccb9?auto=format&fit=crop&w=900&q=85',
+      ]),
       price: 27800,
       stockStatus: 'IN_STOCK',
       warrantyInfo: '10 Ay Samsung Türkiye Garantisi',
@@ -252,12 +259,14 @@ async function main() {
       screenSize: 'Masaüstü Kasa (Monitör Hariç)',
       cosmeticCondition: 'A_PLUS',
       batteryHealth: 'Masaüstü PSU (750W 80+ Gold ATX 3.0)',
-      images: JSON.stringify(['/images/products/desktop-workstation.svg']),
+      images: JSON.stringify([
+        'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=900&q=85',
+      ]),
       price: 54900,
       stockStatus: 'IN_STOCK',
-      warrantyInfo: '12 Ay Go2Tek Sistem Garantisi + Parça Bazlı Distribitör Garantisi',
+      warrantyInfo: 'Mağaza Kontrolü Yapılmış • Parça Kutuları Mevcut',
       technicalCheckSummary:
-        'OCCT Power Supply testi, MemTest86 4 geçiş (%0 hata), 240mm sıvı soğutma pompa/fan devir kontrolü tamamlandı.',
+        'Tüm bileşenlerin genel çalışma, ekran kartı, bellek ve soğutma kontrolleri yapılmıştır.',
       isPublished: true,
     },
     {
@@ -278,12 +287,14 @@ async function main() {
       screenSize: 'Masaüstü (Harici 5 Ekran Destekli)',
       cosmeticCondition: 'A_PLUS',
       batteryHealth: 'Dahili Güç Kaynağı (Sorunsuz)',
-      images: JSON.stringify(['/images/products/mac-studio.svg']),
+      images: JSON.stringify([
+        'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=900&q=85',
+      ]),
       price: 49500,
       stockStatus: 'IN_STOCK',
-      warrantyInfo: '6 Ay Go2Tek Donanım Garantisi',
+      warrantyInfo: 'Mağaza Kontrolü Yapılmış • Temiz Kullanılmış',
       technicalCheckSummary:
-        'Tüm Thunderbolt 4 portları, 10Gb Ethernet, HDMI ve dahili soğutma türbinleri test edildi.',
+        'Tüm bağlantı portları, ağ bağlantıları ve genel çalışma durumu kontrol edilmiştir.',
       isPublished: true,
     },
     {
@@ -304,12 +315,14 @@ async function main() {
       screenSize: '27.0" 4K IPS Black',
       cosmeticCondition: 'A_PLUS',
       batteryHealth: 'AC Güç (Harici Adaptörsüz)',
-      images: JSON.stringify(['/images/products/dell-monitor.svg']),
+      images: JSON.stringify([
+        'https://images.unsplash.com/photo-1527443154391-507e9dc6c5cc?auto=format&fit=crop&w=900&q=85',
+      ]),
       price: 18400,
       stockStatus: 'IN_STOCK',
-      warrantyInfo: '6 Ay Go2Tek Sıfır Ölü Piksel Garantisi',
+      warrantyInfo: 'Mağaza Kontrolü Yapılmış • Sorunsuz Panel',
       technicalCheckSummary:
-        'Kolorimetre ile renk sapması (Delta E < 1.5), 90W USB-C güç iletimi ve ölü piksel taraması yapıldı.',
+        'Panel görüntü kalitesi, Type-C bağlantı ve port kontrolleri mağazamızda yapılmıştır.',
       isPublished: true,
     },
     {
@@ -330,7 +343,9 @@ async function main() {
       screenSize: '6.1" Super Retina XDR 120Hz',
       cosmeticCondition: 'A_PLUS',
       batteryHealth: '%95 (140 Döngü)',
-      images: JSON.stringify(['/images/products/iphone-15-pro.svg']),
+      images: JSON.stringify([
+        'https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&w=900&q=85',
+      ]),
       price: 59500,
       stockStatus: 'IN_STOCK',
       warrantyInfo: '11 Ay Apple Türkiye Garantisi',
@@ -356,12 +371,14 @@ async function main() {
       screenSize: '3x DisplayPort 1.4a + 1x HDMI 2.1',
       cosmeticCondition: 'A',
       batteryHealth: '3x 8-Pin PCIe Güç Girişi',
-      images: JSON.stringify(['/images/products/rtx-gpu.svg']),
+      images: JSON.stringify([
+        'https://images.unsplash.com/photo-1591488320449-011701bb6704?auto=format&fit=crop&w=900&q=85',
+      ]),
       price: 15900,
       stockStatus: 'IN_STOCK',
-      warrantyInfo: '6 Ay Go2Tek Test ve Çalışma Garantisi',
+      warrantyInfo: 'Mağaza Kontrolü Yapılmış • Test Edilerek Teslim',
       technicalCheckSummary:
-        '1080p ve 4K FurMark 45 dk yük altında maksimum 68°C çekirdek, 80°C VRAM sıcaklığı. Fan rulmanları sessiz.',
+        'Görüntü çıkışları, fan çalışması ve genel performans kontrolü mağazamızda yapılmıştır.',
       isPublished: true,
     },
     {
@@ -382,12 +399,14 @@ async function main() {
       screenSize: 'Kompakt Minimalist',
       cosmeticCondition: 'A_PLUS',
       batteryHealth: '%99 (USB-C Şarjlı)',
-      images: JSON.stringify(['/images/products/peripherals-set.svg']),
+      images: JSON.stringify([
+        'https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=900&q=85',
+      ]),
       price: 5450,
       stockStatus: 'IN_STOCK',
-      warrantyInfo: '6 Ay Go2Tek Garantisi',
+      warrantyInfo: 'Mağaza Kontrolü Yapılmış • Kutulu Set',
       technicalCheckSummary:
-        'Tüm tuş anahtarları, elektromanyetik tekerlek, sensör takibi ve Bluetooth/Bolt alıcı bağlantısı test edildi.',
+        'Tuş takımı, sensör takibi ve kablosuz bağlantı kontrolleri mağazamızda yapılmıştır.',
       isPublished: true,
     },
     {
@@ -408,12 +427,14 @@ async function main() {
       screenSize: 'TV / Monitör Bağlantılı (HDMI 2.1)',
       cosmeticCondition: 'A_PLUS',
       batteryHealth: 'DualSense Bataryalar %96+',
-      images: JSON.stringify(['/images/products/ps5-slim.svg']),
+      images: JSON.stringify([
+        'https://images.unsplash.com/photo-1606813907291-d86efa9b94db?auto=format&fit=crop&w=900&q=85',
+      ]),
       price: 21900,
       stockStatus: 'IN_STOCK',
-      warrantyInfo: '6 Ay Go2Tek Konsol & Kol Garantisi',
+      warrantyInfo: 'Mağaza Kontrolü Yapılmış • Çift Kol Dahil',
       technicalCheckSummary:
-        'Gamepad potansiyometre/drift testi (%0 sapma), HDMI 2.1 4K/120Hz çıkışı, PSN erişimi ve fan sesi kontrolü onaylandı.',
+        'Konsol çalışması, HDMI görüntü çıkışı ve DualSense kol kontrolleri mağazamızda yapılmıştır.',
       isPublished: true,
     },
   ];

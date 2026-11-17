@@ -2,11 +2,12 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
+import { CartProvider } from '@/context/CartContext';
 
 export const metadata: Metadata = {
-  title: 'Go2Tek | İkinci El Teknoloji E-Ticaret ve Özel Talep Eşleştirme Platformu',
+  title: 'Go2Tek | 2.El Teknoloji Mağazası & Özel Talep Eşleştirme Platformu',
   description:
-    'Go2Tek mağaza stoklarından 14 noktalı teknik kontrol onaylı ikinci el notebook, tablet, masaüstü bilgisayar satın alın veya bütçenize göre özel cihaz talebi oluşturun.',
+    'Go2Tek 2.El Teknoloji Mağazası: Garantili 2.El Bilgisayar, Notebook, Telefon, Tablet, Aksesuar mağaza satışı ve gizli özel alım-satım talep eşleştirme merkezi. Teknolojide Doğru Adres!',
 };
 
 export default function RootLayout({
@@ -16,10 +17,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="tr">
-      <body className="min-h-screen flex flex-col bg-slate-50 text-slate-900 antialiased">
-        <Navbar />
-        <main className="flex-1">{children}</main>
-        <Footer />
+      <body className="min-h-screen flex flex-col bg-zinc-50 text-zinc-900 antialiased">
+        <CartProvider>
+          <Navbar />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </CartProvider>
       </body>
     </html>
   );

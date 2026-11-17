@@ -125,8 +125,8 @@ export default function SellerOfferPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
       {/* Header */}
-      <div className="bg-slate-900 text-white rounded-3xl p-8 space-y-3 border border-slate-800">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-600/20 text-blue-400 text-xs font-bold">
+      <div className="bg-zinc-900 text-white rounded-3xl p-8 space-y-3 border-b-4 border-red-600">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-600 text-white text-xs font-extrabold">
           <Tag className="w-4 h-4" />
           Go2Tek Özel Satıcı Teklif Sistemi
         </div>
@@ -517,13 +517,13 @@ export default function SellerOfferPage() {
 
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
             <div className="flex items-center gap-2 text-xs text-slate-500">
-              <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0" />
+              <ShieldCheck className="w-4 h-4 text-red-600 shrink-0" />
               <span>Teklifiniz herkese açık ilan olarak yayınlanmaz.</span>
             </div>
             <button
               type="submit"
               disabled={submitting}
-              className="px-8 py-4 rounded-xl bg-slate-900 hover:bg-blue-600 text-white font-bold text-sm shadow-lg transition disabled:opacity-50"
+              className="px-8 py-4 rounded-xl bg-red-600 hover:bg-red-700 text-white font-extrabold text-sm shadow-lg shadow-red-600/25 transition disabled:opacity-50"
             >
               {submitting ? 'Gönderiliyor...' : 'Özel Satıcı Teklifini Gönder'}
             </button>

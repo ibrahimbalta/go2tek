@@ -1,17 +1,39 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ShieldCheck, CreditCard, Building2, AlertCircle, CheckCircle2 } from 'lucide-react';
+import {
+  ShieldCheck,
+  CreditCard,
+  Building2,
+  AlertCircle,
+  CheckCircle2,
+  ShoppingBag,
+  MessageCircle,
+} from 'lucide-react';
+import { useCart } from '@/context/CartContext';
+
+const GO2TEK_WHATSAPP_NUMBER = '905325502026';
 
 export function ProductOrderForm({
   productId,
+  productSlug,
+  productSku,
+  productBrand,
   productTitle,
+  productImage,
+  cosmeticCondition,
   price,
 }: {
   productId: string;
+  productSlug: string;
+  productSku: string;
+  productBrand: string;
   productTitle: string;
+  productImage: string;
+  cosmeticCondition: string;
   price: number;
 }) {
+  const { addToCart } = useCart();
   const [open, setOpen] = useState(false);
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
@@ -28,6 +50,13 @@ export function ProductOrderForm({
     paymentStatus?: string;
     message: string;
   } | null>(null);
+
+  const whatsappText = encodeURIComponent(
+    `Merhaba Go2Tek, "${productTitle}" (Stok Kodu: ${productSku} - Fiyat: ${price.toLocaleString(
+      'tr-TR'
+    )} TL) ürünü hakkında bilgi almak / satın almak istiyorum.`
+  );
+  const whatsappUrl = `https://wa.me/${GO2TEK_WHATSAPP_NUMBER}?text=${whatsappText}`;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -76,32 +105,64 @@ export function ProductOrderForm({
   return (
     <div className="space-y-4">
       {!open ? (
-        <div className="space-y-2.5">
-          <button
-            type="button"
-            onClick={() => setOpen(true)}
-            className="w-full py-4 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-lg shadow-blue-600/20 transition flex items-center justify-center gap-2"
-          >
-            <ShieldCheck className="w-5 h-5" />
-            Go2Tek Güvencesiyle Satın Al / Sipariş Oluştur ({price.toLocaleString('tr-TR')} TL)
-          </button>
-          <p className="text-[11px] text-slate-500 text-center">
-            Ödeme kuruluşu (iyzico/PayTR) altyapısı ve Kurumsal Havale/EFT doğrulaması ile güvenli işlem.
+        <div className="space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="py-4 px-4 rounded-2xl bg-[#25D366] hover:bg-[#1ebe57] text-white font-extrabold text-sm shadow-md transition flex items-center justify-center gap-2"
+            >
+              <MessageCircle className="w-5 h-5 fill-white/20" />
+              WhatsApp ile Sor / Al
+            </a>
+
+            <button
+              type="button"
+              onClick={() =>
+                addToCart({
+                  id: productId,
+                  slug: productSlug,
+                  sku: productSku,
+                  title: productTitle,
+                  brand: productBrand,
+                  price,
+                  image: productImage,
+                  cosmeticCondition,
+                })
+              }
+              className="py-4 px-4 rounded-2xl bg-zinc-900 hover:bg-zinc-800 text-white font-extrabold text-sm transition flex items-center justify-center gap-2"
+            >
+              <ShoppingBag className="w-5 h-5 text-red-500" />
+              Sepete Ekle
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setOpen(true)}
+              className="py-4 px-4 rounded-2xl bg-red-600 hover:bg-red-700 text-white font-extrabold text-sm shadow-lg shadow-red-600/25 transition flex items-center justify-center gap-2"
+            >
+              <ShieldCheck className="w-5 h-5" />
+              Hemen Sipariş Ver
+            </button>
+          </div>
+          <p className="text-[11px] text-zinc-500 text-center font-medium">
+            Genel Kontrolleri Yapılmış Cihazlar • Şeffaf Durum Bilgisi • Güvenilir Alışveriş
           </p>
         </div>
       ) : (
         <form
           onSubmit={handleSubmit}
-          className="bg-slate-50 rounded-2xl p-5 border border-slate-200 space-y-4"
+          className="bg-zinc-50 rounded-2xl p-5 border-2 border-red-600/40 space-y-4"
         >
-          <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-            <h4 className="font-bold text-slate-900 text-sm">
+          <div className="flex items-center justify-between border-b border-zinc-200 pb-3">
+            <h4 className="font-black text-zinc-900 text-sm">
               Satın Alma Seçenekleri: {productTitle}
             </h4>
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="text-xs text-slate-500 hover:text-slate-800"
+              className="text-xs font-bold text-zinc-500 hover:text-red-600"
             >
               Kapat
             </button>
@@ -111,18 +172,18 @@ export function ProductOrderForm({
             <button
               type="button"
               onClick={() => setPaymentMethod('BANK_TRANSFER_EFT')}
-              className={`p-3 rounded-xl border text-left transition flex items-start gap-2.5 ${
+              className={`p-3 rounded-xl border-2 text-left transition flex items-start gap-2.5 ${
                 paymentMethod === 'BANK_TRANSFER_EFT'
-                  ? 'border-blue-600 bg-blue-50/60'
-                  : 'border-slate-200 bg-white'
+                  ? 'border-red-600 bg-red-50/50'
+                  : 'border-zinc-200 bg-white'
               }`}
             >
-              <Building2 className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+              <Building2 className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
               <div>
-                <div className="text-xs font-bold text-slate-900">
+                <div className="text-xs font-extrabold text-zinc-900">
                   Kurumsal Havale / EFT (Ön Sipariş & Dekont Doğrulamalı)
                 </div>
-                <div className="text-[11px] text-slate-500">
+                <div className="text-[11px] text-zinc-500">
                   Dekont referansı finans birimince onaylandığında kargolanır.
                 </div>
               </div>
@@ -131,18 +192,18 @@ export function ProductOrderForm({
             <button
               type="button"
               onClick={() => setPaymentMethod('PAYMENT_GATEWAY_IYZICO')}
-              className={`p-3 rounded-xl border text-left transition flex items-start gap-2.5 ${
+              className={`p-3 rounded-xl border-2 text-left transition flex items-start gap-2.5 ${
                 paymentMethod === 'PAYMENT_GATEWAY_IYZICO'
-                  ? 'border-blue-600 bg-blue-50/60'
-                  : 'border-slate-200 bg-white'
+                  ? 'border-red-600 bg-red-50/50'
+                  : 'border-zinc-200 bg-white'
               }`}
             >
-              <CreditCard className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+              <CreditCard className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
               <div>
-                <div className="text-xs font-bold text-slate-900">
+                <div className="text-xs font-extrabold text-zinc-900">
                   Yetkili Ödeme Kuruluşu (iyzico / PayTR 3D Secure)
                 </div>
-                <div className="text-[11px] text-slate-500">
+                <div className="text-[11px] text-zinc-500">
                   Canlı API anahtarı olmadan sahte onay verilmez.
                 </div>
               </div>
@@ -156,7 +217,7 @@ export function ProductOrderForm({
               placeholder="Adınız Soyadınız *"
               value={customerName}
               onChange={(e) => setCustomerName(e.target.value)}
-              className="px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-sm"
+              className="px-3.5 py-2.5 rounded-xl border border-zinc-200 bg-white text-sm"
             />
             <input
               type="tel"
@@ -164,7 +225,7 @@ export function ProductOrderForm({
               placeholder="Telefon Numaranız (05XX...) *"
               value={customerPhone}
               onChange={(e) => setCustomerPhone(e.target.value)}
-              className="px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-sm"
+              className="px-3.5 py-2.5 rounded-xl border border-zinc-200 bg-white text-sm"
             />
           </div>
 
@@ -173,7 +234,7 @@ export function ProductOrderForm({
             placeholder="E-posta Adresiniz (Fatura & Bilgilendirme)"
             value={customerEmail}
             onChange={(e) => setCustomerEmail(e.target.value)}
-            className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-sm"
+            className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-200 bg-white text-sm"
           />
 
           <textarea
@@ -182,7 +243,7 @@ export function ProductOrderForm({
             placeholder="Açık Teslimat Adresiniz *"
             value={shippingAddress}
             onChange={(e) => setShippingAddress(e.target.value)}
-            className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-sm"
+            className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-200 bg-white text-sm"
           />
 
           {result && (
@@ -212,7 +273,7 @@ export function ProductOrderForm({
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 px-5 rounded-xl bg-slate-900 hover:bg-blue-600 text-white text-xs font-bold transition disabled:opacity-50"
+            className="w-full py-3.5 px-5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-extrabold transition disabled:opacity-50"
           >
             {loading ? 'İşleniyor...' : 'Sipariş / Ödeme Adımını Başlat'}
           </button>
