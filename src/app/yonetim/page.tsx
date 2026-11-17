@@ -35,12 +35,32 @@ type AdminTab =
   | 'TRANSACTIONS'
   | 'INSPECTIONS'
   | 'FINANCE'
-  | 'STORE'
+  | 'PRODUCTS'
+  | 'ORDERS'
+  | 'SITE'
+  | 'SLIDER'
+  | 'USERS'
   | 'AUDIT';
+
+import {
+  Package,
+  Settings2,
+  GalleryHorizontal,
+  UserCog,
+  ExternalLink,
+  Menu as MenuIcon,
+  X as XIcon,
+} from 'lucide-react';
+import { Go2TekLogo } from '@/components/layout/Go2TekLogo';
+import { ProductsPanel } from '@/components/admin/ProductsPanel';
+import { RequestsPanel } from '@/components/admin/RequestsPanel';
+import { SitePanel, SliderPanel } from '@/components/admin/SitePanels';
+import { OrdersPanel, UsersPanel } from '@/components/admin/OrdersUsersPanels';
 
 export default function AdminDashboardPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<AdminTab>('OVERVIEW');
+  const [navOpen, setNavOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [feedback, setFeedback] = useState<{
     type: 'success' | 'error';
@@ -97,18 +117,8 @@ export default function AdminDashboardPage() {
     taxAndOtherCosts: 0,
   });
 
-  // New Store Product Form state
-  const [newProdTitle, setNewProdTitle] = useState('');
-  const [newProdCategory, setNewProdCategory] = useState('NOTEBOOK');
-  const [newProdBrand, setNewProdBrand] = useState('');
-  const [newProdCpu, setNewProdCpu] = useState('');
-  const [newProdRam, setNewProdRam] = useState('16 GB');
-  const [newProdStorage, setNewProdStorage] = useState('512 GB NVMe SSD');
-  const [newProdGpu, setNewProdGpu] = useState('');
-  const [newProdPrice, setNewProdPrice] = useState('');
-
-  async function loadDashboard() {
-    setLoading(true);
+  async function loadDashboard(silent = false) {
+    if (!silent) setLoading(true);
     try {
       const res = await fetch('/api/admin/overview');
       if (res.status === 401) {
@@ -153,6 +163,15 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     loadDashboard();
   }, []);
+
+  function notify(type: 'success' | 'error', text: string) {
+    setFeedback({ type, text });
+    if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  async function reload() {
+    await loadDashboard(true);
+  }
 
   async function handleLogout() {
     await fetch('/api/auth/logout', { method: 'POST' });
@@ -278,42 +297,6 @@ export default function AdminDashboardPage() {
     }
   }
 
-  async function handleCreateProduct(e: React.FormEvent) {
-    e.preventDefault();
-    setFeedback(null);
-    try {
-      const res = await fetch('/api/admin/products', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: newProdTitle,
-          category: newProdCategory,
-          brand: newProdBrand,
-          cpu: newProdCpu,
-          ram: newProdRam,
-          storage: newProdStorage,
-          gpu: newProdGpu,
-          price: Number(newProdPrice),
-        }),
-      });
-      const json = await res.json();
-      if (!res.ok) {
-        setFeedback({ type: 'error', text: json.error || 'Ürün eklenemedi.' });
-      } else {
-        setFeedback({
-          type: 'success',
-          text: `Yeni mağaza ürünü eklendi: ${json.product.sku}`,
-        });
-        setNewProdTitle('');
-        setNewProdBrand('');
-        setNewProdPrice('');
-        await loadDashboard();
-      }
-    } catch {
-      setFeedback({ type: 'error', text: 'Sunucu hatası.' });
-    }
-  }
-
   if (loading || !data) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-16 text-center text-sm font-semibold text-slate-600">
@@ -370,69 +353,184 @@ export default function AdminDashboardPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const currentSelectedTx = transactions.find((t: any) => t.id === selectedTxId);
 
-  const navTabs: Array<{ key: AdminTab; label: string; icon: React.ElementType }> = [
-    { key: 'OVERVIEW', label: 'Genel Bakış', icon: LayoutDashboard },
-    { key: 'BUYER_REQUESTS', label: `Alıcı Talepleri (${stats.totalBuyerRequests})`, icon: Users },
-    { key: 'SELLER_OFFERS', label: `Satıcı Teklifleri (${stats.totalSellerOffers})`, icon: Tag },
-    { key: 'MATCHING_CENTER', label: `Eşleştirme Merkezi (${matchSuggestions.length})`, icon: GitCompare },
-    { key: 'TRANSACTIONS', label: `İşlem Takibi (15 Durum)`, icon: Activity },
-    { key: 'INSPECTIONS', label: `Teknik Kontrol (14 Test)`, icon: ClipboardCheck },
-    { key: 'FINANCE', label: 'Finans & Kâr Takibi', icon: Wallet },
-    { key: 'STORE', label: `Mağaza & Siparişler`, icon: ShoppingBag },
-    { key: 'AUDIT', label: 'İşlem Kayıtları', icon: ShieldAlert },
+  const navGroups: Array<{
+    title: string;
+    items: Array<{ key: AdminTab; label: string; icon: React.ElementType; badge?: number }>;
+  }> = [
+    {
+      title: 'Genel',
+      items: [{ key: 'OVERVIEW', label: 'Genel Bakış', icon: LayoutDashboard }],
+    },
+    {
+      title: 'Özel Talep Merkezi',
+      items: [
+        { key: 'BUYER_REQUESTS', label: 'Alıcı Talepleri', icon: Users, badge: stats.totalBuyerRequests },
+        { key: 'SELLER_OFFERS', label: 'Satıcı Teklifleri', icon: Tag, badge: stats.totalSellerOffers },
+        { key: 'MATCHING_CENTER', label: 'Eşleştirme Merkezi', icon: GitCompare, badge: matchSuggestions.length },
+        { key: 'TRANSACTIONS', label: 'İşlem Takibi', icon: Activity },
+      ],
+    },
+    {
+      title: 'Operasyon',
+      items: [
+        { key: 'INSPECTIONS', label: 'Teknik Kontrol', icon: ClipboardCheck },
+        { key: 'FINANCE', label: 'Finans ve Kâr', icon: Wallet },
+      ],
+    },
+    {
+      title: 'Mağaza',
+      items: [
+        { key: 'PRODUCTS', label: 'Ürünler', icon: Package, badge: products.length },
+        { key: 'ORDERS', label: 'Siparişler', icon: ShoppingBag, badge: storeOrders.length },
+      ],
+    },
+    {
+      title: 'Site İçeriği',
+      items: [
+        { key: 'SITE', label: 'Site Ayarları', icon: Settings2 },
+        { key: 'SLIDER', label: 'Ana Sayfa Slider', icon: GalleryHorizontal },
+      ],
+    },
+    {
+      title: 'Sistem',
+      items: [
+        { key: 'USERS', label: 'Personel', icon: UserCog },
+        { key: 'AUDIT', label: 'İşlem Kayıtları', icon: ShieldAlert },
+      ],
+    },
   ];
 
+  const currentTitle =
+    navGroups.flatMap((g) => g.items).find((i) => i.key === activeTab)?.label || 'Yönetim';
+
+  const ROLE_NAMES: Record<string, string> = {
+    ADMIN: 'Genel Yönetici',
+    SALES_STAFF: 'Satış & Eşleştirme',
+    TECHNICAL_STAFF: 'Teknik Kontrol',
+    FINANCE_STAFF: 'Finans',
+  };
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-      {/* Top Admin Header */}
-      <div className="bg-zinc-900 text-white rounded-3xl p-6 border-b-4 border-red-600 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <span className="text-xs font-extrabold uppercase tracking-wider text-red-500">
-            Go2Tek Kapalı Devre Yönetim & Eşleştirme Merkezi
-          </span>
-          <h1 className="text-2xl font-black mt-0.5">
-            Hoş Geldiniz, {session.name}
-          </h1>
-          <p className="text-xs text-slate-300">
-            Yetki Rolü: <strong className="text-white">{session.role}</strong> • Alıcı talepleri ve satıcı teklifleri yalnızca bu panelde görüntülenir.
-          </p>
+    <div className="min-h-screen bg-zinc-100 text-zinc-900">
+      {/* Mobil menü arka planı */}
+      {navOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-zinc-900/50 lg:hidden"
+          onClick={() => setNavOpen(false)}
+        />
+      )}
+
+      {/* Sol menü */}
+      <aside
+        className={`fixed inset-y-0 left-0 z-40 w-64 bg-zinc-900 text-zinc-300 flex flex-col transition-transform duration-200 ${
+          navOpen ? 'translate-x-0' : '-translate-x-full'
+        } lg:translate-x-0`}
+      >
+        <div className="px-5 py-5 border-b border-zinc-800 flex items-center justify-between">
+          <Go2TekLogo variant="dark" size="sm" />
+          <button
+            type="button"
+            className="lg:hidden p-1.5 rounded-lg hover:bg-zinc-800"
+            onClick={() => setNavOpen(false)}
+            aria-label="Menüyü kapat"
+          >
+            <XIcon className="w-5 h-5" />
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={handleLogout}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-rose-600 text-xs font-bold transition self-start md:self-auto"
-        >
-          <LogOut className="w-4 h-4" />
-          Güvenli Çıkış
-        </button>
-      </div>
 
-      {/* Module Navigation Tabs */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-2">
-        {navTabs.map((tab) => {
-          const Icon = tab.icon;
-          const active = activeTab === tab.key;
-          return (
+        <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-5">
+          {navGroups.map((group) => (
+            <div key={group.title}>
+              <div className="px-3 mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+                {group.title}
+              </div>
+              <div className="space-y-0.5">
+                {group.items.map((item) => {
+                  const Icon = item.icon;
+                  const active = activeTab === item.key;
+                  return (
+                    <button
+                      key={item.key}
+                      type="button"
+                      onClick={() => {
+                        setActiveTab(item.key);
+                        setFeedback(null);
+                        setNavOpen(false);
+                      }}
+                      className={`w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition ${
+                        active
+                          ? 'bg-red-600 text-white'
+                          : 'text-zinc-300 hover:bg-zinc-800 hover:text-white'
+                      }`}
+                    >
+                      <span className="flex items-center gap-3 min-w-0">
+                        <Icon className="w-4 h-4 shrink-0" />
+                        <span className="truncate">{item.label}</span>
+                      </span>
+                      {item.badge !== undefined && (
+                        <span
+                          className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${
+                            active ? 'bg-white/20 text-white' : 'bg-zinc-800 text-zinc-400'
+                          }`}
+                        >
+                          {item.badge}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </nav>
+
+        <div className="p-4 border-t border-zinc-800 space-y-3">
+          <div className="px-1">
+            <div className="text-sm font-semibold text-white truncate">{session.name}</div>
+            <div className="text-xs text-zinc-500">{ROLE_NAMES[session.role] || session.role}</div>
+          </div>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-zinc-800 hover:bg-red-600 text-white text-xs font-semibold transition"
+          >
+            <LogOut className="w-4 h-4" />
+            Güvenli Çıkış
+          </button>
+        </div>
+      </aside>
+
+      {/* İçerik alanı */}
+      <div className="lg:pl-64 min-h-screen flex flex-col">
+        <header className="sticky top-0 z-20 bg-white/90 backdrop-blur-md border-b border-zinc-200 px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0">
             <button
-              key={tab.key}
               type="button"
-              onClick={() => {
-                setActiveTab(tab.key);
-                setFeedback(null);
-              }}
-              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition ${
-                active
-                  ? 'bg-red-600 text-white shadow-sm'
-                  : 'bg-white border border-zinc-200 text-zinc-700 hover:bg-red-50 hover:border-red-400'
-              }`}
+              className="lg:hidden p-2 rounded-lg border border-zinc-200 hover:bg-zinc-50"
+              onClick={() => setNavOpen(true)}
+              aria-label="Menüyü aç"
             >
-              <Icon className="w-4 h-4" />
-              {tab.label}
+              <MenuIcon className="w-5 h-5" />
             </button>
-          );
-        })}
-      </div>
+            <div className="min-w-0">
+              <h1 className="text-lg font-bold text-zinc-900 truncate">{currentTitle}</h1>
+              <p className="text-xs text-zinc-500 hidden sm:block">
+                Go2Tek Yönetim Paneli • Başvurular yalnızca bu panelde görünür
+              </p>
+            </div>
+          </div>
+          <a
+            href="/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-semibold text-zinc-700 shrink-0"
+          >
+            <ExternalLink className="w-4 h-4" />
+            <span className="hidden sm:inline">Siteyi Görüntüle</span>
+          </a>
+        </header>
 
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 space-y-6">
       {/* Feedback Banner */}
       {feedback && (
         <div
@@ -585,192 +683,14 @@ export default function AdminDashboardPage() {
         </div>
       )}
 
-      {/* TAB 2: ALICI TALEPLERİ */}
+      {/* ALICI TALEPLERİ */}
       {activeTab === 'BUYER_REQUESTS' && (
-        <div className="bg-white rounded-3xl border border-slate-200 p-6 space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
-            <div>
-              <h2 className="text-lg font-black text-slate-900">
-                Özel Alıcı Talepleri (Gizli Müşteri Havuzu)
-              </h2>
-              <p className="text-xs text-slate-500">
-                Müşterilerin &quot;Bütçeme Göre Cihaz Bul&quot; formundan gönderdiği gizli talepler.
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <div className="relative">
-                <input
-                  type="text"
-                  value={buyerSearch}
-                  onChange={(e) => setBuyerSearch(e.target.value)}
-                  placeholder="Ref No, Ad Soyad, Marka, CPU ara..."
-                  className="pl-8 pr-3 py-2 rounded-xl border border-slate-200 text-xs"
-                />
-                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
-              </div>
-              <select
-                value={buyerFilterCat}
-                onChange={(e) => setBuyerFilterCat(e.target.value)}
-                className="px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white"
-              >
-                <option value="ALL">Tüm Kategoriler</option>
-                {PRODUCT_CATEGORIES.map((c) => (
-                  <option key={c.key} value={c.key}>
-                    {c.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-4">
-            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-            {filteredBuyers.map((b: any) => (
-              <div
-                key={b.id}
-                className="p-5 rounded-2xl border border-slate-200 bg-slate-50/60 flex flex-col lg:flex-row lg:items-center justify-between gap-4"
-              >
-                <div className="space-y-2">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="px-2.5 py-1 rounded-lg bg-slate-900 text-white text-xs font-bold">
-                      {b.referenceNo}
-                    </span>
-                    <span className="px-2.5 py-1 rounded-lg bg-blue-100 text-blue-800 text-xs font-bold">
-                      {b.category}
-                    </span>
-                    <span className="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 text-xs font-bold">
-                      Bütçe: {b.minBudget.toLocaleString('tr-TR')} -{' '}
-                      {b.maxBudget.toLocaleString('tr-TR')} TL
-                    </span>
-                    <span className="text-xs text-slate-500">
-                      Durum: <strong>{b.status}</strong>
-                    </span>
-                  </div>
-                  <div className="text-sm font-bold text-slate-900">
-                    Marka: {b.brandPref} • CPU: {b.cpuPref} • RAM: {b.ramPref} • Depolama:{' '}
-                    {b.storagePref} • GPU: {b.gpuPref} • Kozmetik:{' '}
-                    {COSMETIC_LABELS[b.cosmeticPref] || b.cosmeticPref}
-                  </div>
-                  <div className="text-xs text-slate-600">
-                    <strong>Kullanım Amacı:</strong> {b.usagePurpose} |{' '}
-                    <strong>Not:</strong> {b.additionalNotes || '-'}
-                  </div>
-                </div>
-
-                <div className="p-3.5 rounded-xl bg-white border border-slate-200 shrink-0 space-y-1 text-xs">
-                  <div className="font-bold text-slate-900">{b.fullName}</div>
-                  <div className="flex items-center gap-1.5 text-blue-600 font-bold">
-                    <Phone className="w-3.5 h-3.5" />
-                    <span>{b.phone}</span>
-                  </div>
-                  <div className="text-[11px] text-slate-400">
-                    İletişim & KVKK Onaylı
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <RequestsPanel type="BUYER" data={data} reload={reload} notify={notify} />
       )}
 
-      {/* TAB 3: SATICI TEKLİFLERİ */}
+      {/* SATICI TEKLİFLERİ */}
       {activeTab === 'SELLER_OFFERS' && (
-        <div className="bg-white rounded-3xl border border-slate-200 p-6 space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
-            <div>
-              <h2 className="text-lg font-black text-slate-900">
-                Özel Satıcı Teklifleri (Gizli Cihaz Havuzu)
-              </h2>
-              <p className="text-xs text-slate-500">
-                Müşterilerin &quot;Cihazımı Satmak İstiyorum&quot; formundan gönderdiği cihazlar ve fotoğrafları.
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <div className="relative">
-                <input
-                  type="text"
-                  value={sellerSearch}
-                  onChange={(e) => setSellerSearch(e.target.value)}
-                  placeholder="Ref No, Marka, Model, Satıcı ara..."
-                  className="pl-8 pr-3 py-2 rounded-xl border border-slate-200 text-xs"
-                />
-                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
-              </div>
-              <select
-                value={sellerFilterCat}
-                onChange={(e) => setSellerFilterCat(e.target.value)}
-                className="px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white"
-              >
-                <option value="ALL">Tüm Kategoriler</option>
-                {PRODUCT_CATEGORIES.map((c) => (
-                  <option key={c.key} value={c.key}>
-                    {c.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-4">
-            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-            {filteredSellers.map((s: any) => {
-              let photos: string[] = ['/images/products/macbook-pro-14.svg'];
-              try {
-                const parsed = JSON.parse(s.photos);
-                if (Array.isArray(parsed) && parsed.length > 0) photos = parsed;
-              } catch {
-                // fallback
-              }
-              return (
-                <div
-                  key={s.id}
-                  className="p-5 rounded-2xl border border-slate-200 bg-slate-50/60 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4"
-                >
-                  <div className="flex items-start gap-4">
-                    <img
-                      src={photos[0]}
-                      alt={s.model}
-                      className="w-24 h-20 rounded-xl border border-slate-200 bg-white p-1.5 object-contain shrink-0"
-                    />
-                    <div className="space-y-1.5">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="px-2.5 py-0.5 rounded-lg bg-slate-900 text-white text-xs font-bold">
-                          {s.referenceNo}
-                        </span>
-                        <span className="px-2.5 py-0.5 rounded-lg bg-blue-100 text-blue-800 text-xs font-bold">
-                          İstenen Fiyat: {s.requestedPrice.toLocaleString('tr-TR')} TL
-                        </span>
-                        <span className="px-2.5 py-0.5 rounded-lg bg-slate-200 text-slate-800 text-xs font-semibold">
-                          Seri No: {s.serialNumber}
-                        </span>
-                      </div>
-                      <h3 className="text-sm font-black text-slate-900">
-                        {s.brand} {s.model} ({s.cpu} • {s.ram} • {s.storage} • {s.gpu})
-                      </h3>
-                      <p className="text-xs text-slate-600">
-                        <strong>Kozmetik:</strong> {s.cosmeticCondition} |{' '}
-                        <strong>Pil:</strong> {s.batteryHealth} |{' '}
-                        <strong>Bilinen Arızalar:</strong> {s.knownDefects}
-                      </p>
-                      <p className="text-xs text-slate-500">{s.description}</p>
-                    </div>
-                  </div>
-
-                  <div className="p-3.5 rounded-xl bg-white border border-slate-200 shrink-0 space-y-1 text-xs">
-                    <div className="font-bold text-slate-900">{s.fullName}</div>
-                    <div className="flex items-center gap-1.5 text-blue-600 font-bold">
-                      <Phone className="w-3.5 h-3.5" />
-                      <span>{s.phone}</span>
-                    </div>
-                    <div className="text-[11px] text-slate-400">
-                      Durum: {s.status}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        <RequestsPanel type="SELLER" data={data} reload={reload} notify={notify} />
       )}
 
       {/* TAB 4: EŞLEŞTİRME MERKEZİ */}
@@ -1617,131 +1537,29 @@ export default function AdminDashboardPage() {
         </div>
       )}
 
-      {/* TAB 8: MAĞAZA & SİPARİŞLER */}
-      {activeTab === 'STORE' && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <form
-            onSubmit={handleCreateProduct}
-            className="lg:col-span-5 bg-white rounded-3xl border border-slate-200 p-6 space-y-4"
-          >
-            <div className="flex items-center gap-2 text-sm font-black text-slate-900">
-              <PlusCircle className="w-4 h-4 text-blue-600" />
-              <span>Go2Tek Mağaza Stoğuna Yeni Ürün Ekle</span>
-            </div>
+      {/* ÜRÜNLER */}
+      {activeTab === 'PRODUCTS' && (
+        <ProductsPanel data={data} reload={reload} notify={notify} />
+      )}
 
-            <div className="space-y-3 text-xs">
-              <input
-                type="text"
-                required
-                placeholder="Ürün Başlığı *"
-                value={newProdTitle}
-                onChange={(e) => setNewProdTitle(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200"
-              />
-              <div className="grid grid-cols-2 gap-2.5">
-                <select
-                  value={newProdCategory}
-                  onChange={(e) => setNewProdCategory(e.target.value)}
-                  className="px-3 py-2.5 rounded-xl border border-slate-200 bg-white"
-                >
-                  {PRODUCT_CATEGORIES.map((c) => (
-                    <option key={c.key} value={c.key}>
-                      {c.label}
-                    </option>
-                  ))}
-                </select>
-                <input
-                  type="text"
-                  required
-                  placeholder="Marka *"
-                  value={newProdBrand}
-                  onChange={(e) => setNewProdBrand(e.target.value)}
-                  className="px-3 py-2.5 rounded-xl border border-slate-200"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-2.5">
-                <input
-                  type="text"
-                  placeholder="İşlemci (CPU)"
-                  value={newProdCpu}
-                  onChange={(e) => setNewProdCpu(e.target.value)}
-                  className="px-3 py-2.5 rounded-xl border border-slate-200"
-                />
-                <input
-                  type="text"
-                  placeholder="RAM (Örn: 16 GB)"
-                  value={newProdRam}
-                  onChange={(e) => setNewProdRam(e.target.value)}
-                  className="px-3 py-2.5 rounded-xl border border-slate-200"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-2.5">
-                <input
-                  type="text"
-                  placeholder="Depolama (Örn: 512 GB SSD)"
-                  value={newProdStorage}
-                  onChange={(e) => setNewProdStorage(e.target.value)}
-                  className="px-3 py-2.5 rounded-xl border border-slate-200"
-                />
-                <input
-                  type="text"
-                  placeholder="Ekran Kartı (GPU)"
-                  value={newProdGpu}
-                  onChange={(e) => setNewProdGpu(e.target.value)}
-                  className="px-3 py-2.5 rounded-xl border border-slate-200"
-                />
-              </div>
-              <input
-                type="number"
-                required
-                placeholder="Satış Fiyatı (TL) *"
-                value={newProdPrice}
-                onChange={(e) => setNewProdPrice(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-bold"
-              />
-              <button
-                type="submit"
-                className="w-full py-3 rounded-xl bg-slate-900 hover:bg-blue-600 text-white font-bold transition"
-              >
-                Mağaza Stoğuna Ekle
-              </button>
-            </div>
-          </form>
+      {/* SİPARİŞLER */}
+      {activeTab === 'ORDERS' && (
+        <OrdersPanel data={data} reload={reload} notify={notify} />
+      )}
 
-          <div className="lg:col-span-7 bg-white rounded-3xl border border-slate-200 p-6 space-y-4">
-            <h3 className="text-base font-black text-slate-900">
-              Mağaza Sipariş Talepleri ({storeOrders.length}) ve Stok ({products.length})
-            </h3>
-            {storeOrders.length === 0 ? (
-              <p className="text-xs text-slate-500">
-                Henüz mağaza siparişi oluşturulmadı.
-              </p>
-            ) : (
-              <div className="space-y-2.5">
-                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                {storeOrders.map((ord: any) => (
-                  <div
-                    key={ord.id}
-                    className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs flex items-center justify-between"
-                  >
-                    <div>
-                      <div className="font-bold text-slate-900">
-                        {ord.orderNo} — {ord.product?.title}
-                      </div>
-                      <div className="text-slate-600">
-                        Müşteri: {ord.customerName} ({ord.customerPhone}) • Tutar:{' '}
-                        {ord.amount.toLocaleString('tr-TR')} TL
-                      </div>
-                    </div>
-                    <span className="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-900 font-bold">
-                      {ord.paymentStatus}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
+      {/* SİTE AYARLARI */}
+      {activeTab === 'SITE' && (
+        <SitePanel data={data} reload={reload} notify={notify} />
+      )}
+
+      {/* SLIDER */}
+      {activeTab === 'SLIDER' && (
+        <SliderPanel data={data} reload={reload} notify={notify} />
+      )}
+
+      {/* PERSONEL */}
+      {activeTab === 'USERS' && (
+        <UsersPanel data={data} reload={reload} notify={notify} />
       )}
 
       {/* TAB 9: DENETİM KAYITLARI (AUDIT LOG) */}
@@ -1772,6 +1590,8 @@ export default function AdminDashboardPage() {
           </div>
         </div>
       )}
+        </main>
+      </div>
     </div>
   );
 }

@@ -1,7 +1,11 @@
 import React from 'react';
 import { Phone, Mail, MapPin, Clock, ShieldCheck } from 'lucide-react';
+import { getSiteSettings } from '@/lib/site-config';
 
-export default function ContactPage() {
+export const dynamic = 'force-dynamic';
+
+export default async function ContactPage() {
+  const settings = await getSiteSettings();
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
       <div className="bg-slate-900 text-white rounded-3xl p-8 sm:p-10 space-y-3">
@@ -25,28 +29,28 @@ export default function ContactPage() {
               <MapPin className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
               <div>
                 <strong className="block text-slate-900">Adres</strong>
-                Kozyatağı Mah. Teknoloji Plaza No:24 Kat:4 Kadıköy / İstanbul
+                {settings.address}
               </div>
             </li>
             <li className="flex items-start gap-3">
               <Phone className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
               <div>
                 <strong className="block text-slate-900">Müşteri Hizmetleri & Eşleştirme Hattı</strong>
-                0 (216) 550 20 26
+                {settings.phone}
               </div>
             </li>
             <li className="flex items-start gap-3">
               <Mail className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
               <div>
                 <strong className="block text-slate-900">Kurumsal E-posta</strong>
-                iletisim@go2tek.com • destek@go2tek.com
+                {settings.email}
               </div>
             </li>
             <li className="flex items-start gap-3">
               <Clock className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
               <div>
                 <strong className="block text-slate-900">Çalışma Saatleri</strong>
-                Pazartesi – Cumartesi: 09:00 – 19:00
+                {settings.workingHours}
               </div>
             </li>
           </ul>

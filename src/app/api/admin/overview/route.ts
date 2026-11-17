@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { getCurrentSession } from '@/lib/auth';
 import { calculateMatchScore } from '@/lib/matching-engine';
 import { maskSerialNumber } from '@/lib/security';
+import { getHeroSlides, getSiteSettings } from '@/lib/site-config';
 
 export async function GET() {
   const session = await getCurrentSession();
@@ -21,6 +22,9 @@ export async function GET() {
     products,
     storeOrders,
     auditLogs,
+    users,
+    siteSettings,
+    heroSlides,
   ] = await Promise.all([
     prisma.buyerRequest.findMany({
       orderBy: { createdAt: 'desc' },
@@ -56,15 +60,30 @@ export async function GET() {
       orderBy: { createdAt: 'desc' },
       take: 40,
     }),
+    prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        isActive: true,
+        createdAt: true,
+      },
+      orderBy: { createdAt: 'asc' },
+    }),
+    getSiteSettings(),
+    getHeroSlides(),
   ]);
 
-  // Apply role-based serial number masking on seller offers
   const sellerOffers = sellerOffersRaw.map((offer) => ({
     ...offer,
     serialNumber: maskSerialNumber(offer.serialNumber, session.role),
+    rawSerialNumber:
+      session.role === 'ADMIN' || session.role === 'TECHNICAL_STAFF'
+        ? offer.serialNumber
+        : undefined,
   }));
 
-  // Compute smart matching recommendations across all non-cancelled Buyer Requests and Seller Offers
   const matchSuggestions: Array<{
     buyerRequest: (typeof buyerRequests)[number];
     sellerOffer: (typeof sellerOffers)[number];
@@ -95,15 +114,13 @@ export async function GET() {
     (a, b) => b.evaluation.totalScore - a.evaluation.totalScore
   );
 
-  // Compute Overview Metrics
   const pendingMatchesCount = transactions.filter(
-    (t) => t.currentStage === 'NEW_REQUEST' || t.currentStage === 'MATCH_PROPOSED'
+    (t) =>
+      t.currentStage === 'NEW_REQUEST' || t.currentStage === 'MATCH_PROPOSED'
   ).length;
 
   const activeTransactionsCount = transactions.filter(
-    (t) =>
-      t.currentStage !== 'COMPLETED' &&
-      t.currentStage !== 'CANCELLED'
+    (t) => t.currentStage !== 'COMPLETED' && t.currentStage !== 'CANCELLED'
   ).length;
 
   const completedTransactionsCount = transactions.filter(
@@ -129,5 +146,8 @@ export async function GET() {
     products,
     storeOrders,
     auditLogs,
+    users,
+    siteSettings,
+    heroSlides,
   });
 }

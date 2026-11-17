@@ -165,19 +165,25 @@ const SLIDES: SlideItem[] = [
   },
 ];
 
-export function HeroSlider() {
+export function HeroSlider({
+  initialSlides,
+}: {
+  initialSlides?: SlideItem[];
+}) {
+  const slidesList =
+    initialSlides && initialSlides.length > 0 ? initialSlides : SLIDES;
   const [current, setCurrent] = useState(0);
   const [paused, setPaused] = useState(false);
 
   useEffect(() => {
     if (paused) return;
     const timer = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % SLIDES.length);
+      setCurrent((prev) => (prev + 1) % slidesList.length);
     }, 6000);
     return () => clearInterval(timer);
-  }, [paused]);
+  }, [paused, slidesList.length]);
 
-  const slide = SLIDES[current];
+  const slide = slidesList[current] || slidesList[0];
 
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
@@ -286,11 +292,11 @@ export function HeroSlider() {
         {/* Bottom Tabs */}
         <div className="bg-white/90 backdrop-blur-xs border-t border-zinc-200/80 px-4 sm:px-8 py-3 flex flex-wrap items-center justify-between gap-3">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 flex-1">
-            {SLIDES.map((s, idx) => {
+            {slidesList.map((s, idx) => {
               const active = idx === current;
               return (
                 <button
-                  key={s.id}
+                  key={s.id || idx}
                   type="button"
                   onClick={() => setCurrent(idx)}
                   className={`px-3.5 py-2 rounded-xl text-xs font-bold text-left transition flex items-center gap-2 ${
@@ -314,7 +320,9 @@ export function HeroSlider() {
             <button
               type="button"
               onClick={() =>
-                setCurrent((prev) => (prev - 1 + SLIDES.length) % SLIDES.length)
+                setCurrent(
+                  (prev) => (prev - 1 + slidesList.length) % slidesList.length
+                )
               }
               className="p-2 rounded-xl border border-zinc-200 bg-white hover:border-red-600 hover:text-red-600 text-zinc-700 transition"
               aria-label="Önceki Slayt"
@@ -323,7 +331,9 @@ export function HeroSlider() {
             </button>
             <button
               type="button"
-              onClick={() => setCurrent((prev) => (prev + 1) % SLIDES.length)}
+              onClick={() =>
+                setCurrent((prev) => (prev + 1) % slidesList.length)
+              }
               className="p-2 rounded-xl border border-zinc-200 bg-white hover:border-red-600 hover:text-red-600 text-zinc-700 transition"
               aria-label="Sonraki Slayt"
             >

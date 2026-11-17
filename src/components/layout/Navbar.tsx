@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState } from 'react';
 import Link from 'next/link';
@@ -20,7 +20,13 @@ import {
   LayoutGrid,
 } from 'lucide-react';
 
-export function Navbar() {
+export function Navbar({
+  topBarText = 'Go2Tek 2.El Teknoloji Mağazası • Alım - Satım - Takas',
+  phone = '0 (216) 550 20 26',
+}: {
+  topBarText?: string;
+  phone?: string;
+}) {
   const pathname = usePathname();
   const router = useRouter();
   const { items, openCart } = useCart();
@@ -55,12 +61,12 @@ export function Navbar() {
             <div className="flex items-center gap-4">
               <span className="inline-flex items-center gap-1.5 font-semibold">
                 <ShieldCheck className="w-3.5 h-3.5 text-white" />
-                Go2Tek 2.El Teknoloji Mağazası • Alım - Satım - Takas
+                {topBarText}
               </span>
               <span className="hidden md:inline text-red-300">|</span>
               <span className="hidden md:inline-flex items-center gap-1.5 text-red-50 font-medium">
                 <Phone className="w-3 h-3 text-white" />
-                0 (216) 550 20 26
+                {phone}
               </span>
             </div>
 
@@ -298,3 +304,4 @@ export function Navbar() {
     </>
   );
 }
+

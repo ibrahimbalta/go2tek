@@ -29,6 +29,8 @@ export async function POST(req: NextRequest) {
       technicalCheckSummary,
       description,
       imageUrl,
+      stockStatus,
+      isPublished,
     } = body;
 
     if (!title || !category || !brand || !price) {
@@ -75,7 +77,7 @@ export async function POST(req: NextRequest) {
           imageUrl || '/images/products/macbook-pro-14.svg',
         ]),
         price: Number(price),
-        stockStatus: 'IN_STOCK',
+        stockStatus: String(stockStatus || 'IN_STOCK'),
         warrantyInfo: String(
           warrantyInfo || '6 Ay Go2Tek Kurumsal Donanım Garantisi'
         ).trim(),
@@ -83,7 +85,7 @@ export async function POST(req: NextRequest) {
           technicalCheckSummary ||
             '14 noktalı donanım ve kozmetik kontrolleri başarıyla tamamlandı.'
         ).trim(),
-        isPublished: true,
+        isPublished: isPublished === undefined ? true : Boolean(isPublished),
       },
     });
 

@@ -245,3 +245,10 @@ model AuditLog {
   ipAddress  String   @default("127.0.0.1")
   createdAt  DateTime @default(now())
 }
+
+model SiteConfig {
+  key       String   @id
+  valueJson String
+  updatedAt DateTime @updatedAt
+}
+

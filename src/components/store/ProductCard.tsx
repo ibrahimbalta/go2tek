@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ShieldCheck, ShoppingBag, CheckCircle2, MessageCircle } from 'lucide-react';
 import { COSMETIC_LABELS, PRODUCT_CATEGORIES } from '@/lib/constants';
 import { useCart } from '@/context/CartContext';
+import { usePublicSettings } from '@/context/SettingsContext';
 
 export interface StoreProductItem {
   id: string;
@@ -27,10 +28,10 @@ export interface StoreProductItem {
   warrantyInfo: string;
 }
 
-const GO2TEK_WHATSAPP_NUMBER = '905325502026';
 
 export function ProductCard({ product }: { product: StoreProductItem }) {
   const { addToCart, items } = useCart();
+  const { whatsappNumber } = usePublicSettings();
 
   let imageSrc = '/images/products/macbook-pro-14.svg';
   try {
@@ -54,7 +55,7 @@ export function ProductCard({ product }: { product: StoreProductItem }) {
       'tr-TR'
     )} TL) ürünü hakkında bilgi almak / satın almak istiyorum.`
   );
-  const whatsappUrl = `https://wa.me/${GO2TEK_WHATSAPP_NUMBER}?text=${whatsappText}`;
+  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${whatsappText}`;
 
   return (
     <div className="group bg-white rounded-2xl border border-zinc-200/90 hover:border-zinc-300 shadow-2xs hover:shadow-lg transition-all duration-200 flex flex-col overflow-hidden">

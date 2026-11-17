@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import { ProductCard } from '@/components/store/ProductCard';
 import { HeroSlider } from '@/components/home/HeroSlider';
+import { getHeroSlides, getSiteSettings } from '@/lib/site-config';
 import {
   Sparkles,
   Tag,
@@ -20,11 +21,15 @@ import {
 export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
-  const featuredProducts = await prisma.product.findMany({
-    where: { isPublished: true },
-    orderBy: { createdAt: 'desc' },
-    take: 8,
-  });
+  const [featuredProducts, heroSlides, siteSettings] = await Promise.all([
+    prisma.product.findMany({
+      where: { isPublished: true },
+      orderBy: { createdAt: 'desc' },
+      take: 8,
+    }),
+    getHeroSlides(),
+    getSiteSettings(),
+  ]);
 
   const quickCategories = [
     { label: '2.El Notebook', slug: 'notebook', icon: Laptop },
@@ -40,7 +45,7 @@ export default async function HomePage() {
   return (
     <div className="space-y-14 pb-12">
       {/* 1. Clean Hero Slider */}
-      <HeroSlider />
+      <HeroSlider initialSlides={heroSlides} />
 
       {/* 2. Simple 3-Option Guide ("Ne Yapmak İstersiniz?") */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -181,10 +186,10 @@ export default async function HomePage() {
               Go2Tek Güvenli Alım - Satım Süreci
             </div>
             <h3 className="text-xl sm:text-2xl font-extrabold">
-              Kontrol Edilmiş Cihazlar ve Şeffaf Ürün Bilgisi
+              {siteSettings.bannerTitle}
             </h3>
             <p className="text-xs sm:text-sm text-red-50 leading-relaxed">
-              Mağazamızdaki ve özel talep sistemimizdeki cihazların ekran, klavye, batarya ve temel donanım kontrolleri yapılarak mevcut kozmetik durumları açık ve şeffaf şekilde paylaşılır.
+              {siteSettings.bannerDescription}
             </p>
           </div>
           <div className="flex flex-wrap gap-3 shrink-0">

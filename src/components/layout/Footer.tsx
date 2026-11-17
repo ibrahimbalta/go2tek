@@ -1,6 +1,7 @@
-import React from 'react';
+﻿import React from 'react';
 import Link from 'next/link';
 import { Go2TekLogo } from './Go2TekLogo';
+import { getSiteSettings } from '@/lib/site-config';
 import {
   ShieldCheck,
   Lock,
@@ -13,7 +14,8 @@ import {
   Handshake,
 } from 'lucide-react';
 
-export function Footer() {
+export async function Footer() {
+  const settings = await getSiteSettings();
   return (
     <footer className="bg-zinc-950 text-zinc-300 border-t-4 border-red-600 mt-20 pb-20 md:pb-0">
       {/* Top 4 Storefront Trust Pillars Banner (Matching Left Column of Storefront Sign) */}
@@ -62,7 +64,7 @@ export function Footer() {
             <div>
               <h4 className="text-sm font-black text-white">Güvenilir Alışveriş</h4>
               <p className="text-[11px] text-red-400 font-bold italic">
-                Teknolojide Doğru Adres!
+                {settings.slogan}
               </p>
             </div>
           </div>
@@ -75,8 +77,7 @@ export function Footer() {
           <div className="space-y-4">
             <Go2TekLogo variant="dark" size="md" />
             <p className="text-sm text-zinc-400 leading-relaxed">
-              Go2Tek 2.El Teknoloji Mağazası; kendi stokundaki 14 noktalı teknik kontrolden geçmiş bilgisayar, notebook, telefon, tablet ve aksesuarları satan, aynı zamanda özel talep eşleştirme sistemiyle güvenli alım-satım aracılığı sunan kurumsal teknoloji merkezidir.
-            </p>
+              {settings.footerDescription}</p>
             <div className="flex items-center gap-2 text-xs text-red-400 font-bold">
               <ShieldCheck className="w-4 h-4" />
               <span>Özel Talepler Herkese Açık İlan Olarak Yayınlanmaz</span>
@@ -181,15 +182,15 @@ export function Footer() {
             <ul className="space-y-2.5 text-sm">
               <li className="flex items-start gap-2.5">
                 <MapPin className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
-                <span>Kozyatağı Teknoloji Caddesi No:24, Kadıköy / İstanbul</span>
+                <span>{settings.address}</span>
               </li>
               <li className="flex items-center gap-2.5">
                 <Phone className="w-4 h-4 text-red-500 shrink-0" />
-                <span>0 (216) 550 20 26</span>
+                <span>{settings.phone}</span>
               </li>
               <li className="flex items-center gap-2.5">
                 <Mail className="w-4 h-4 text-red-500 shrink-0" />
-                <span>iletisim@go2tek.com</span>
+                <span>{settings.email}</span>
               </li>
             </ul>
             <div className="pt-3 border-t border-zinc-800 flex flex-col gap-2 text-xs text-zinc-400">
@@ -216,7 +217,7 @@ export function Footer() {
         <div className="mt-12 pt-8 border-t border-zinc-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
           <p>
             © 2026 Go2Tek 2.El Teknoloji Mağazası. Tüm hakları saklıdır.{' '}
-            <strong className="text-red-500 italic">Teknolojide Doğru Adres!</strong>
+            <strong className="text-red-500 italic">{settings.slogan}</strong>
           </p>
           <div className="flex items-center gap-4">
             <span className="inline-flex items-center gap-1 text-emerald-400">
@@ -231,3 +232,5 @@ export function Footer() {
     </footer>
   );
 }
+
+

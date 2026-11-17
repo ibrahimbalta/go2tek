@@ -11,8 +11,8 @@ import {
   MessageCircle,
 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
+import { usePublicSettings } from '@/context/SettingsContext';
 
-const GO2TEK_WHATSAPP_NUMBER = '905325502026';
 
 export function ProductOrderForm({
   productId,
@@ -34,6 +34,7 @@ export function ProductOrderForm({
   price: number;
 }) {
   const { addToCart } = useCart();
+  const { whatsappNumber } = usePublicSettings();
   const [open, setOpen] = useState(false);
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
@@ -56,7 +57,7 @@ export function ProductOrderForm({
       'tr-TR'
     )} TL) ürünü hakkında bilgi almak / satın almak istiyorum.`
   );
-  const whatsappUrl = `https://wa.me/${GO2TEK_WHATSAPP_NUMBER}?text=${whatsappText}`;
+  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${whatsappText}`;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
