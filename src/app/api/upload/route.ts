@@ -12,7 +12,7 @@ import path from 'path';
 export async function POST(req: NextRequest) {
   try {
     const ip = req.headers.get('x-forwarded-for') || '127.0.0.1';
-    const rate = checkRateLimit(`upload:${ip}`, 15, 60_000);
+    const rate = checkRateLimit(`upload:${ip}`, 20, 60_000);
     if (!rate.allowed) {
       return NextResponse.json(
         { error: 'Çok fazla dosya yükleme denemesi yapıldı.' },
@@ -61,8 +61,48 @@ export async function POST(req: NextRequest) {
     const ext =
       path.extname(file.name).toLowerCase() || (isVideo ? '.mp4' : '.jpg');
     const safeFileName = `${isVideo ? 'video' : 'device'}-${crypto.randomUUID()}${ext}`;
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads');
 
+    // 1. If Supabase Storage credentials are configured, upload to Supabase Storage bucket
+    const supabaseUrl = process.env.SUPABASE_URL?.trim();
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
+    if (supabaseUrl && supabaseKey) {
+      const bucket = process.env.SUPABASE_STORAGE_BUCKET || 'go2tek-media';
+      const uploadRes = await fetch(
+        `${supabaseUrl}/storage/v1/object/${bucket}/${safeFileName}`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${supabaseKey}`,
+            'Content-Type': file.type || 'application/octet-stream',
+            'x-upsert': 'true',
+          },
+          body: buffer,
+        }
+      );
+
+      if (uploadRes.ok) {
+        return NextResponse.json({
+          success: true,
+          mediaType: isVideo ? 'video' : 'image',
+          url: `${supabaseUrl}/storage/v1/object/public/${bucket}/${safeFileName}`,
+        });
+      }
+    }
+
+    // 2. On Vercel serverless (read-only filesystem), return a safe base64 media URL
+    if (process.env.VERCEL === '1') {
+      const safeMime = isVideo
+        ? file.type || 'video/mp4'
+        : file.type || 'image/jpeg';
+      return NextResponse.json({
+        success: true,
+        mediaType: isVideo ? 'video' : 'image',
+        url: `data:${safeMime};base64,${buffer.toString('base64')}`,
+      });
+    }
+
+    // 3. Local development: write to public/uploads
+    const uploadDir = path.join(process.cwd(), 'public', 'uploads');
     await fs.mkdir(uploadDir, { recursive: true });
     await fs.writeFile(path.join(uploadDir, safeFileName), buffer);
 

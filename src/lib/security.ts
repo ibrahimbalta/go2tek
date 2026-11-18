@@ -222,6 +222,15 @@ export function sanitizeSafeUrl(
     return clean;
   }
 
+  // Allow safe base64 media data URLs (never allow data:text/html or data:image/svg+xml)
+  if (
+    /^data:(image\/(jpeg|jpg|png|webp)|video\/(mp4|webm|quicktime));base64,[A-Za-z0-9+/=]+$/i.test(
+      clean
+    )
+  ) {
+    return clean;
+  }
+
   try {
     const parsed = new URL(clean);
     if (parsed.protocol === 'https:' || parsed.protocol === 'http:') {

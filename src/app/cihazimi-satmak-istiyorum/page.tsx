@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { PRODUCT_CATEGORIES, COSMETIC_LABELS } from '@/lib/constants';
+import { uploadMediaFile } from '@/lib/client-upload';
 import {
   Tag,
   Lock,
@@ -54,20 +55,12 @@ export default function SellerOfferPage() {
     setUploadingPhoto(true);
     setError('');
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.error || 'Fotoğraf yüklenemedi.');
-      } else if (data.url) {
-        setPhotos((prev) => [data.url, ...prev]);
+      const result = await uploadMediaFile(file, 'image');
+      if (!result.ok || !result.url) {
+        setError(result.error || 'Fotoğraf yüklenemedi.');
+      } else {
+        setPhotos((prev) => [result.url!, ...prev]);
       }
-    } catch {
-      setError('Fotoğraf yükleme sırasında hata oluştu.');
     } finally {
       setUploadingPhoto(false);
     }
@@ -79,21 +72,12 @@ export default function SellerOfferPage() {
     setUploadingVideo(true);
     setError('');
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('type', 'video');
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.error || 'Video yüklenemedi.');
-      } else if (data.url) {
-        setVideoUrl(data.url);
+      const result = await uploadMediaFile(file, 'video');
+      if (!result.ok || !result.url) {
+        setError(result.error || 'Video yüklenemedi.');
+      } else {
+        setVideoUrl(result.url);
       }
-    } catch {
-      setError('Video yükleme sırasında hata oluştu.');
     } finally {
       setUploadingVideo(false);
     }

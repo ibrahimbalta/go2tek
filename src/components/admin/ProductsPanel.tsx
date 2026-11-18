@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Pencil, Trash2, Plus, Search, Eye, EyeOff, Upload, Video } from 'lucide-react';
 import { PRODUCT_CATEGORIES, COSMETIC_LABELS } from '@/lib/constants';
+import { uploadMediaFile } from '@/lib/client-upload';
 import {
   Card,
   Field,
@@ -93,6 +94,7 @@ export function ProductsPanel({ data, reload, notify }: PanelProps) {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadingVideo, setUploadingVideo] = useState(false);
+  const [uploadError, setUploadError] = useState('');
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const products: any[] = data.products;
@@ -143,13 +145,14 @@ export function ProductsPanel({ data, reload, notify }: PanelProps) {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
+    setUploadError('');
     try {
-      const fd = new FormData();
-      fd.append('file', file);
-      const res = await fetch('/api/upload', { method: 'POST', body: fd });
-      const json = await res.json();
-      if (!res.ok) notify('error', json.error || 'Görsel yüklenemedi.');
-      else set('imageUrl', json.url);
+      const result = await uploadMediaFile(file, 'image');
+      if (!result.ok || !result.url) {
+        setUploadError(result.error || 'Görsel yüklenemedi.');
+      } else {
+        set('imageUrl', result.url);
+      }
     } finally {
       setUploading(false);
     }
@@ -159,14 +162,14 @@ export function ProductsPanel({ data, reload, notify }: PanelProps) {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploadingVideo(true);
+    setUploadError('');
     try {
-      const fd = new FormData();
-      fd.append('file', file);
-      fd.append('type', 'video');
-      const res = await fetch('/api/upload', { method: 'POST', body: fd });
-      const json = await res.json();
-      if (!res.ok) notify('error', json.error || 'Video yüklenemedi.');
-      else set('videoUrl', json.url);
+      const result = await uploadMediaFile(file, 'video');
+      if (!result.ok || !result.url) {
+        setUploadError(result.error || 'Video yüklenemedi.');
+      } else {
+        set('videoUrl', result.url);
+      }
     } finally {
       setUploadingVideo(false);
     }
@@ -454,6 +457,11 @@ export function ProductsPanel({ data, reload, notify }: PanelProps) {
                 </div>
                 {editing.videoUrl && !editing.videoUrl.includes('youtube.com') && !editing.videoUrl.includes('youtu.be') && (
                   <video src={editing.videoUrl} controls className="mt-3 h-36 rounded-xl border border-zinc-200 bg-black" />
+                )}
+                {uploadError && (
+                  <p className="mt-2 text-xs font-semibold text-red-600">
+                    {uploadError}
+                  </p>
                 )}
               </Field>
               <Field
