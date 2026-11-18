@@ -1,8 +1,21 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import { Phone, Mail, MapPin, Clock, ShieldCheck } from 'lucide-react';
 import { getSiteSettings } from '@/lib/site-config';
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'İletişim — Bartın / Merkez',
+  description:
+    'Go2Tek Bartın / Merkez iletişim bilgileri: Telefon 0 (545) 346 79 86. Test edilmiş 2.el bilgisayar, notebook, telefon alım-satım ve takas merkezi.',
+  openGraph: {
+    title: 'İletişim | Go2Tek Bartın / Merkez',
+    description:
+      'Bartın / Merkez Go2Tek 2.El Teknoloji Mağazası. Tel: 0 (545) 346 79 86',
+    images: ['/images/go2tek-hakkimizda.jpg'],
+  },
+};
 
 export default async function ContactPage() {
   const settings = await getSiteSettings();

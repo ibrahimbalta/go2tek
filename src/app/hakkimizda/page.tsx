@@ -1,8 +1,21 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ShieldCheck, CheckCircle2, Lock, Cpu } from 'lucide-react';
 import { INSPECTION_CRITERIA } from '@/lib/constants';
 import { AboutSection } from '@/components/home/AboutSection';
+
+export const metadata: Metadata = {
+  title: 'Hakkımızda — Bartın 2.El Teknoloji Mağazası',
+  description:
+    'Go2Tek Bartın: Test edilmiş ikinci el bilgisayar, notebook, telefon ve tabletleri uygun fiyata sunan, değerinde alım ve takas hizmeti veren güvenilir teknoloji girişimi.',
+  openGraph: {
+    title: 'Hakkımızda | Go2Tek Bartın',
+    description:
+      'Test edilmiş bilgisayar ve teknolojik araçları Bartınlılara uygun fiyata sunan, değerinde alım ve takas hizmeti veren güvenilir teknoloji mağazası.',
+    images: ['/images/go2tek-hakkimizda.jpg'],
+  },
+};
 
 export default function AboutPage() {
   return (

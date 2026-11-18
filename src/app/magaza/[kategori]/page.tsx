@@ -1,4 +1,5 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { PRODUCT_CATEGORIES } from '@/lib/constants';
 import { ProductCard } from '@/components/store/ProductCard';
@@ -6,6 +7,31 @@ import { getPublishedProducts } from '@/lib/store-queries';
 import { ShieldCheck, Sparkles, ArrowLeft } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ kategori: string }>;
+}): Promise<Metadata> {
+  const { kategori } = await params;
+  const matchedCat = PRODUCT_CATEGORIES.find((c) => c.slug === kategori);
+  const title = matchedCat
+    ? `${matchedCat.label} Fiyatları ve Modelleri`
+    : 'Mağaza Ürünleri';
+  const description = matchedCat
+    ? `Bartın Go2Tek 2.El Teknoloji Mağazası: ${matchedCat.description}`
+    : 'Bartın Go2Tek 2.El Teknoloji Mağazası kontrol edilmiş ikinci el ürünler.';
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title: `${title} | Go2Tek Bartın`,
+      description,
+      images: ['/images/go2tek-hakkimizda.jpg'],
+    },
+  };
+}
 
 export default async function CategoryStorePage({
   params,

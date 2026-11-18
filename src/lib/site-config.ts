@@ -38,21 +38,21 @@ export interface HeroSlideData {
 }
 
 export const DEFAULT_SITE_SETTINGS: SiteSettingsData = {
-  siteTitle: 'Go2Tek | 2.El Teknoloji Mağazası',
-  topBarText: 'Go2Tek 2.El Teknoloji Mağazası • Alım - Satım - Takas',
-  phone: '0 (216) 550 20 26',
-  whatsappNumber: '905325502026',
+  siteTitle: 'Go2Tek | Bartın 2.El Teknoloji Mağazası & Özel Talep Eşleştirme',
+  topBarText: 'Go2Tek Bartın 2.El Teknoloji Mağazası • Alım - Satım - Takas',
+  phone: '0 (545) 346 79 86',
+  whatsappNumber: '905453467986',
   email: 'iletisim@go2tek.com',
-  address: 'Kozyatağı Teknoloji Caddesi No:24, Kadıköy / İstanbul',
+  address: 'Bartın / Merkez',
   workingHours: 'Pazartesi – Cumartesi: 09:00 – 19:00',
   footerDescription:
-    'Go2Tek 2.El Teknoloji Mağazası; kendi stokundaki genel kontrolleri yapılmış bilgisayar, notebook, telefon, tablet ve aksesuarları satan, aynı zamanda özel talep eşleştirme sistemiyle güvenli alım-satım aracılığı sunan kurumsal teknoloji merkezidir.',
+    'Go2Tek; test edilmiş bilgisayar, notebook, tablet, telefon ve teknolojik ürünleri Bartınlılara uygun fiyatlarla sunan, değerinde alım ve takas hizmeti veren güvenilir teknoloji mağazasıdır.',
   slogan: 'Teknolojide Doğru Adres!',
   bannerTitle: 'Kontrol Edilmiş Cihazlar ve Şeffaf Ürün Bilgisi',
   bannerDescription:
     'Mağazamızdaki ve özel talep sistemimizdeki cihazların ekran, klavye, batarya ve temel donanım kontrolleri yapılarak mevcut kozmetik durumları açık ve şeffaf şekilde paylaşılır.',
   aboutLeadText:
-    'Go2Tek; ikinci el notebook, tablet, masaüstü bilgisayar, telefon ve elektronik ürünlerin alım-satımında açık ilan sitelerinin karmaşasını ortadan kaldıran kurumsal bir mağaza ve özel eşleştirme platformudur.',
+    'Go2Tek; Bartın’da test edilmiş ikinci el bilgisayar ve teknolojik araçları uygun fiyata sunan, değerinde alım ve takas hizmeti veren güvenilir bir teknoloji girişimidir.',
 };
 
 export const DEFAULT_HERO_SLIDES: HeroSlideData[] = [

@@ -8,8 +8,8 @@ interface PublicSettings {
 }
 
 const SettingsContext = createContext<PublicSettings>({
-  whatsappNumber: '905325502026',
-  phone: '0 (216) 550 20 26',
+  whatsappNumber: '905453467986',
+  phone: '0 (545) 346 79 86',
 });
 
 export function SettingsProvider({

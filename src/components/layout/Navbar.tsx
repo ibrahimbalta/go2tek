@@ -20,8 +20,8 @@ import {
 } from 'lucide-react';
 
 export function Navbar({
-  topBarText = 'Go2Tek 2.El Teknoloji Mağazası • Alım - Satım - Takas',
-  phone = '0 (216) 550 20 26',
+  topBarText = 'Go2Tek Bartın 2.El Teknoloji Mağazası • Alım - Satım - Takas',
+  phone = '0 (545) 346 79 86',
 }: {
   topBarText?: string;
   phone?: string;

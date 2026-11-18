@@ -1,4 +1,5 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getPublishedProductBySlug } from '@/lib/store-queries';
@@ -21,6 +22,47 @@ import {
 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const product = await getPublishedProductBySlug(slug);
+  if (!product) {
+    return { title: 'Ürün Bulunamadı' };
+  }
+
+  let firstImg = '/images/go2tek-hakkimizda.jpg';
+  try {
+    const parsed = JSON.parse(product.images);
+    if (Array.isArray(parsed) && parsed[0]) firstImg = parsed[0];
+  } catch {
+    // fallback
+  }
+
+  const title = `${product.title} — ${product.price.toLocaleString('tr-TR')} TL`;
+  const description = `${product.brand} ${product.model} (${product.cpu}, ${product.ram}, ${product.storage}) • Bartın Go2Tek 2.El Teknoloji Mağazası. ${product.description.slice(0, 130)}`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      type: 'website',
+      locale: 'tr_TR',
+      title,
+      description,
+      images: [{ url: firstImg, alt: product.title }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [firstImg],
+    },
+  };
+}
 
 export default async function ProductDetailPage({
   params,
