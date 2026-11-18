@@ -8,6 +8,7 @@ import {
   PRODUCT_CATEGORIES,
 } from '@/lib/constants';
 import { ProductOrderForm } from '@/components/store/ProductOrderForm';
+import { ProductMediaGallery } from '@/components/store/ProductMediaGallery';
 import {
   ShieldCheck,
   CheckCircle2,
@@ -76,40 +77,15 @@ export default async function ProductDetailPage({
 
       {/* Main Product Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Left Gallery */}
+        {/* Left Gallery (Images + Device Video) */}
         <div className="lg:col-span-6 space-y-4">
-          <div className="bg-white rounded-3xl border-2 border-zinc-200 p-8 aspect-[16/11] flex items-center justify-center relative overflow-hidden">
-            <img
-              src={images[0]}
-              alt={product.title}
-              className="w-full h-full object-contain"
-            />
-            <div className="absolute top-4 left-4 flex gap-2">
-              <span className="px-3 py-1 rounded-lg bg-zinc-900 text-white text-xs font-extrabold">
-                Stok Kodu: {product.sku}
-              </span>
-              <span className="px-3 py-1 rounded-lg bg-red-600 text-white text-xs font-extrabold">
-                {product.stockStatus === 'IN_STOCK' ? 'Stokta Hazır' : 'Rezerve'}
-              </span>
-            </div>
-          </div>
-
-          {images.length > 1 && (
-            <div className="grid grid-cols-4 gap-3">
-              {images.map((img, i) => (
-                <div
-                  key={i}
-                  className="bg-white rounded-xl border border-zinc-200 p-2 aspect-video flex items-center justify-center"
-                >
-                  <img
-                    src={img}
-                    alt={`${product.title} - ${i + 1}`}
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-              ))}
-            </div>
-          )}
+          <ProductMediaGallery
+            images={images}
+            videoUrl={product.videoUrl}
+            title={product.title}
+            sku={product.sku}
+            stockStatus={product.stockStatus}
+          />
 
           {/* Technical Inspection Summary Card */}
           <div className="bg-zinc-50 rounded-2xl border border-zinc-200 p-5 space-y-2">

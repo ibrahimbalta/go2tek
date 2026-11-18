@@ -77,6 +77,12 @@ export async function PATCH(
               ? body.images
               : JSON.stringify(body.images)
             : existing.images,
+        videoUrl:
+          body.videoUrl !== undefined
+            ? body.videoUrl
+              ? String(body.videoUrl).trim()
+              : null
+            : existing.videoUrl,
         isPublished:
           body.isPublished !== undefined
             ? Boolean(body.isPublished)

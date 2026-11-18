@@ -38,6 +38,7 @@ model Product {
   cosmeticCondition     String   // A_PLUS, A, B, C
   batteryHealth         String
   images                String   // JSON string array of image paths/URLs
+  videoUrl              String?  // Optional device video URL (MP4/WebM/YouTube)
   price                 Float
   stockStatus           String   @default("IN_STOCK") // IN_STOCK, RESERVED, SOLD, OUT_OF_STOCK
   warrantyInfo          String
@@ -96,6 +97,7 @@ model SellerOffer {
   batteryHealth     String
   knownDefects      String
   photos            String   // JSON string array of uploaded photo paths
+  videoUrl          String?  // Optional device video URL
   requestedPrice    Float
   fullName          String
   phone             String

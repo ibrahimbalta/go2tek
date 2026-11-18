@@ -29,6 +29,7 @@ export async function POST(req: NextRequest) {
       technicalCheckSummary,
       description,
       imageUrl,
+      videoUrl,
       stockStatus,
       isPublished,
     } = body;
@@ -76,6 +77,7 @@ export async function POST(req: NextRequest) {
         images: JSON.stringify([
           imageUrl || '/images/products/macbook-pro-14.svg',
         ]),
+        videoUrl: videoUrl ? String(videoUrl).trim() : null,
         price: Number(price),
         stockStatus: String(stockStatus || 'IN_STOCK'),
         warrantyInfo: String(

@@ -30,6 +30,8 @@ export default function SellerOfferPage() {
   const [photos, setPhotos] = useState<string[]>([
     '/images/products/macbook-pro-14.svg',
   ]);
+  const [videoUrl, setVideoUrl] = useState('');
+  const [uploadingVideo, setUploadingVideo] = useState(false);
   const [requestedPrice, setRequestedPrice] = useState('');
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
@@ -71,6 +73,32 @@ export default function SellerOfferPage() {
     }
   }
 
+  async function handleVideoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingVideo(true);
+    setError('');
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('type', 'video');
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || 'Video yüklenemedi.');
+      } else if (data.url) {
+        setVideoUrl(data.url);
+      }
+    } catch {
+      setError('Video yükleme sırasında hata oluştu.');
+    } finally {
+      setUploadingVideo(false);
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
@@ -96,6 +124,7 @@ export default function SellerOfferPage() {
           batteryHealth,
           knownDefects,
           photos,
+          videoUrl,
           requestedPrice: Number(requestedPrice),
           fullName,
           phone,
@@ -450,6 +479,42 @@ export default function SellerOfferPage() {
                 ))}
               </div>
             )}
+
+            <div className="pt-3 border-t border-slate-100 space-y-2">
+              <label className="block text-xs font-bold text-slate-700">
+                Cihaz Videosu (Opsiyonel — MP4/WEBM/MOV yükleyin veya video bağlantısı girin)
+              </label>
+              <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+                <label className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold cursor-pointer transition shrink-0">
+                  <Upload className="w-4 h-4 text-red-600" />
+                  <span>
+                    {uploadingVideo
+                      ? 'Video Yükleniyor...'
+                      : 'Video Yükle (MP4, WEBM, MOV)'}
+                  </span>
+                  <input
+                    type="file"
+                    accept="video/mp4,video/webm,video/quicktime"
+                    onChange={handleVideoUpload}
+                    className="hidden"
+                  />
+                </label>
+                <input
+                  type="text"
+                  value={videoUrl}
+                  onChange={(e) => setVideoUrl(e.target.value)}
+                  placeholder="veya YouTube / Video bağlantısı yapıştırın..."
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs"
+                />
+              </div>
+              {videoUrl && !videoUrl.includes('youtube.com') && !videoUrl.includes('youtu.be') && (
+                <video
+                  src={videoUrl}
+                  controls
+                  className="h-32 rounded-xl border border-slate-200 bg-black mt-2"
+                />
+              )}
+            </div>
           </div>
 
           {/* Section 3: İletişim & İzinler */}

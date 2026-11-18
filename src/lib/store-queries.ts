@@ -19,6 +19,7 @@ export interface StoreProductRecord {
   cosmeticCondition: string;
   batteryHealth: string;
   images: string;
+  videoUrl?: string | null;
   price: number;
   stockStatus: string;
   warrantyInfo: string;

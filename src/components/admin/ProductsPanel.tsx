@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Pencil, Trash2, Plus, Search, Eye, EyeOff, Upload } from 'lucide-react';
+import { Pencil, Trash2, Plus, Search, Eye, EyeOff, Upload, Video } from 'lucide-react';
 import { PRODUCT_CATEGORIES, COSMETIC_LABELS } from '@/lib/constants';
 import {
   Card,
@@ -37,6 +37,7 @@ interface ProductForm {
   technicalCheckSummary: string;
   description: string;
   imageUrl: string;
+  videoUrl: string;
   isPublished: boolean;
 }
 
@@ -60,6 +61,7 @@ const EMPTY: ProductForm = {
   technicalCheckSummary: '',
   description: '',
   imageUrl: '',
+  videoUrl: '',
   isPublished: true,
 };
 
@@ -86,6 +88,7 @@ export function ProductsPanel({ data, reload, notify }: PanelProps) {
   const [editing, setEditing] = useState<ProductForm | null>(null);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadingVideo, setUploadingVideo] = useState(false);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const products: any[] = data.products;
@@ -121,6 +124,7 @@ export function ProductsPanel({ data, reload, notify }: PanelProps) {
       technicalCheckSummary: p.technicalCheckSummary,
       description: p.description,
       imageUrl: firstImage(p.images),
+      videoUrl: p.videoUrl || '',
       isPublished: p.isPublished,
     });
   }
@@ -142,6 +146,23 @@ export function ProductsPanel({ data, reload, notify }: PanelProps) {
       else set('imageUrl', json.url);
     } finally {
       setUploading(false);
+    }
+  }
+
+  async function handleVideoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingVideo(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('type', 'video');
+      const res = await fetch('/api/upload', { method: 'POST', body: fd });
+      const json = await res.json();
+      if (!res.ok) notify('error', json.error || 'Video yüklenemedi.');
+      else set('videoUrl', json.url);
+    } finally {
+      setUploadingVideo(false);
     }
   }
 
@@ -410,6 +431,23 @@ export function ProductsPanel({ data, reload, notify }: PanelProps) {
                 </div>
                 {editing.imageUrl && (
                   <img src={editing.imageUrl} alt="" className="mt-3 h-28 rounded-xl object-cover border border-zinc-200" />
+                )}
+              </Field>
+              <Field
+                label="Cihaz Videosu (MP4/WebM yükle veya YouTube / Video bağlantısı)"
+                hint="Kısa tanıtım videosu yükleyebilir veya YouTube linki yapıştırabilirsiniz."
+                className="sm:col-span-2"
+              >
+                <div className="flex flex-col sm:flex-row gap-3 items-start">
+                  <input value={editing.videoUrl} onChange={(e) => set('videoUrl', e.target.value)} placeholder="https://youtube.com/watch?v=... veya /uploads/video-..." className={inputCls} />
+                  <label className={btnGhost + ' cursor-pointer shrink-0'}>
+                    <Video className="w-4 h-4 text-red-600" />
+                    {uploadingVideo ? 'Yükleniyor...' : 'Video Yükle'}
+                    <input type="file" accept="video/mp4,video/webm,video/quicktime" onChange={handleVideoUpload} className="hidden" />
+                  </label>
+                </div>
+                {editing.videoUrl && !editing.videoUrl.includes('youtube.com') && !editing.videoUrl.includes('youtu.be') && (
+                  <video src={editing.videoUrl} controls className="mt-3 h-36 rounded-xl border border-zinc-200 bg-black" />
                 )}
               </Field>
             </div>

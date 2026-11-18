@@ -203,6 +203,18 @@ export function RequestsPanel({
                         <div className="text-xs text-zinc-500">
                           Seri No: {r.rawSerialNumber ?? r.serialNumber} • Arızalar: {r.knownDefects}
                         </div>
+                        {r.videoUrl && (
+                          <div className="pt-1">
+                            <a
+                              href={r.videoUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-xs font-semibold text-red-600 hover:underline"
+                            >
+                              Cihaz Videosunu İzle →
+                            </a>
+                          </div>
+                        )}
                       </>
                     )}
                   </div>

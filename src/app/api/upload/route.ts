@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { validateUploadedImageFile } from '@/lib/security';
+import {
+  validateUploadedImageFile,
+  validateUploadedVideoFile,
+} from '@/lib/security';
 import { checkRateLimit } from '@/lib/rate-limit';
 import crypto from 'crypto';
 import fs from 'fs/promises';
@@ -8,7 +11,7 @@ import path from 'path';
 export async function POST(req: NextRequest) {
   try {
     const ip = req.headers.get('x-forwarded-for') || '127.0.0.1';
-    const rate = checkRateLimit(`upload:${ip}`, 12, 60_000);
+    const rate = checkRateLimit(`upload:${ip}`, 15, 60_000);
     if (!rate.allowed) {
       return NextResponse.json(
         { error: 'Çok fazla dosya yükleme denemesi yapıldı.' },
@@ -18,24 +21,35 @@ export async function POST(req: NextRequest) {
 
     const formData = await req.formData();
     const file = formData.get('file') as File | null;
+    const mediaType = String(formData.get('type') || '');
 
     if (!file) {
       return NextResponse.json({ error: 'Dosya seçilmedi.' }, { status: 400 });
     }
 
-    const validation = validateUploadedImageFile({
-      fileName: file.name,
-      mimeType: file.type,
-      sizeBytes: file.size,
-    });
+    const isVideo =
+      mediaType === 'video' || file.type.toLowerCase().startsWith('video/');
+
+    const validation = isVideo
+      ? validateUploadedVideoFile({
+          fileName: file.name,
+          mimeType: file.type,
+          sizeBytes: file.size,
+        })
+      : validateUploadedImageFile({
+          fileName: file.name,
+          mimeType: file.type,
+          sizeBytes: file.size,
+        });
 
     if (!validation.valid) {
       return NextResponse.json({ error: validation.error }, { status: 400 });
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    const ext = path.extname(file.name).toLowerCase() || '.jpg';
-    const safeFileName = `device-${crypto.randomUUID()}${ext}`;
+    const ext =
+      path.extname(file.name).toLowerCase() || (isVideo ? '.mp4' : '.jpg');
+    const safeFileName = `${isVideo ? 'video' : 'device'}-${crypto.randomUUID()}${ext}`;
     const uploadDir = path.join(process.cwd(), 'public', 'uploads');
 
     await fs.mkdir(uploadDir, { recursive: true });
@@ -43,6 +57,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
+      mediaType: isVideo ? 'video' : 'image',
       url: `/uploads/${safeFileName}`,
     });
   } catch (error) {

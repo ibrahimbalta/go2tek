@@ -115,3 +115,45 @@ export function validateUploadedImageFile(file: {
 
   return { valid: true };
 }
+
+const ALLOWED_VIDEO_MIME_TYPES = new Set([
+  'video/mp4',
+  'video/webm',
+  'video/quicktime',
+]);
+
+const ALLOWED_VIDEO_EXTENSIONS = new Set(['.mp4', '.webm', '.mov']);
+const MAX_VIDEO_SIZE_BYTES = 25 * 1024 * 1024; // 25 MB
+
+export function validateUploadedVideoFile(file: {
+  fileName: string;
+  mimeType: string;
+  sizeBytes: number;
+}): { valid: boolean; error?: string } {
+  if (!file.fileName || !file.mimeType) {
+    return { valid: false, error: 'Video adı veya türü eksik.' };
+  }
+
+  const lowerName = file.fileName.toLowerCase();
+  const dotIndex = lowerName.lastIndexOf('.');
+  const ext = dotIndex >= 0 ? lowerName.slice(dotIndex) : '';
+
+  if (
+    !ALLOWED_VIDEO_MIME_TYPES.has(file.mimeType.toLowerCase()) ||
+    !ALLOWED_VIDEO_EXTENSIONS.has(ext)
+  ) {
+    return {
+      valid: false,
+      error: 'Yalnızca MP4, WEBM veya MOV formatında video yüklenebilir.',
+    };
+  }
+
+  if (file.sizeBytes <= 0 || file.sizeBytes > MAX_VIDEO_SIZE_BYTES) {
+    return {
+      valid: false,
+      error: 'Video boyutu 25 MB sınırını aşamaz.',
+    };
+  }
+
+  return { valid: true };
+}

@@ -77,6 +77,7 @@ export async function PATCH(
             cosmeticCondition: existing.cosmeticCondition,
             batteryHealth: existing.batteryHealth,
             images: existing.photos,
+            videoUrl: existing.videoUrl || null,
             price: Number(body.salePrice || Math.round(existing.requestedPrice * 1.12)),
             stockStatus: 'IN_STOCK',
             warrantyInfo: 'Mağaza Kontrolü Yapılmış • Mevcut Durumu Belirtilmiştir',
