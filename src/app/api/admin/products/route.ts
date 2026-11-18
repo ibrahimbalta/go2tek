@@ -30,6 +30,8 @@ export async function POST(req: NextRequest) {
       description,
       imageUrl,
       videoUrl,
+      shopierUrl,
+      sahibindenUrl,
       stockStatus,
       isPublished,
     } = body;
@@ -78,6 +80,8 @@ export async function POST(req: NextRequest) {
           imageUrl || '/images/products/macbook-pro-14.svg',
         ]),
         videoUrl: videoUrl ? String(videoUrl).trim() : null,
+        shopierUrl: shopierUrl ? String(shopierUrl).trim() : null,
+        sahibindenUrl: sahibindenUrl ? String(sahibindenUrl).trim() : null,
         price: Number(price),
         stockStatus: String(stockStatus || 'IN_STOCK'),
         warrantyInfo: String(

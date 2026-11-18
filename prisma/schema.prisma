@@ -39,6 +39,8 @@ model Product {
   batteryHealth         String
   images                String   // JSON string array of image paths/URLs
   videoUrl              String?  // Optional device video URL (MP4/WebM/YouTube)
+  shopierUrl            String?  // Admin-configured Shopier product link
+  sahibindenUrl         String?  // Admin-configured Sahibinden Param Güvende link
   price                 Float
   stockStatus           String   @default("IN_STOCK") // IN_STOCK, RESERVED, SOLD, OUT_OF_STOCK
   warrantyInfo          String

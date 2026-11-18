@@ -183,6 +183,8 @@ export default async function ProductDetailPage({
               productTitle={product.title}
               productImage={images[0]}
               cosmeticCondition={product.cosmeticCondition}
+              shopierUrl={product.shopierUrl}
+              sahibindenUrl={product.sahibindenUrl}
               price={product.price}
             />
           </div>

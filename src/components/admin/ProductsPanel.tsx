@@ -38,6 +38,8 @@ interface ProductForm {
   description: string;
   imageUrl: string;
   videoUrl: string;
+  shopierUrl: string;
+  sahibindenUrl: string;
   isPublished: boolean;
 }
 
@@ -62,6 +64,8 @@ const EMPTY: ProductForm = {
   description: '',
   imageUrl: '',
   videoUrl: '',
+  shopierUrl: '',
+  sahibindenUrl: '',
   isPublished: true,
 };
 
@@ -125,6 +129,8 @@ export function ProductsPanel({ data, reload, notify }: PanelProps) {
       description: p.description,
       imageUrl: firstImage(p.images),
       videoUrl: p.videoUrl || '',
+      shopierUrl: p.shopierUrl || '',
+      sahibindenUrl: p.sahibindenUrl || '',
       isPublished: p.isPublished,
     });
   }
@@ -449,6 +455,28 @@ export function ProductsPanel({ data, reload, notify }: PanelProps) {
                 {editing.videoUrl && !editing.videoUrl.includes('youtube.com') && !editing.videoUrl.includes('youtu.be') && (
                   <video src={editing.videoUrl} controls className="mt-3 h-36 rounded-xl border border-zinc-200 bg-black" />
                 )}
+              </Field>
+              <Field
+                label="Shopier Satın Alma Linki"
+                hint="Müşteri 'Shopier ile Al' seçeneğine tıkladığında bu linke yönlendirilir."
+              >
+                <input
+                  value={editing.shopierUrl}
+                  onChange={(e) => set('shopierUrl', e.target.value)}
+                  placeholder="https://www.shopier.com/..."
+                  className={inputCls}
+                />
+              </Field>
+              <Field
+                label="Sahibinden Param Güvende Linki"
+                hint="Müşteri 'Sahibinden Param Güvende' seçeneğine tıkladığında bu ilana yönlendirilir."
+              >
+                <input
+                  value={editing.sahibindenUrl}
+                  onChange={(e) => set('sahibindenUrl', e.target.value)}
+                  placeholder="https://www.sahibinden.com/ilan/..."
+                  className={inputCls}
+                />
               </Field>
             </div>
 

@@ -83,6 +83,18 @@ export async function PATCH(
               ? String(body.videoUrl).trim()
               : null
             : existing.videoUrl,
+        shopierUrl:
+          body.shopierUrl !== undefined
+            ? body.shopierUrl
+              ? String(body.shopierUrl).trim()
+              : null
+            : existing.shopierUrl,
+        sahibindenUrl:
+          body.sahibindenUrl !== undefined
+            ? body.sahibindenUrl
+              ? String(body.sahibindenUrl).trim()
+              : null
+            : existing.sahibindenUrl,
         isPublished:
           body.isPublished !== undefined
             ? Boolean(body.isPublished)

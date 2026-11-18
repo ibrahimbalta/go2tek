@@ -25,9 +25,11 @@ export async function POST(req: NextRequest) {
       notes,
     } = body;
 
-    if (!productId || !customerName || !customerPhone || !shippingAddress) {
+    const isInStorePickup = paymentMethod === 'IN_STORE_RESERVE';
+
+    if (!productId || !customerName || !customerPhone || (!isInStorePickup && !shippingAddress)) {
       return NextResponse.json(
-        { error: 'Lütfen ad soyad, telefon ve teslimat adresi alanlarını doldurun.' },
+        { error: 'Lütfen ad soyad, telefon ve teslimat bilgilerinizi eksiksiz doldurun.' },
         { status: 400 }
       );
     }
@@ -46,10 +48,12 @@ export async function POST(req: NextRequest) {
     const chosenMethod =
       paymentMethod === 'PAYMENT_GATEWAY_IYZICO'
         ? 'PAYMENT_GATEWAY_IYZICO'
+        : isInStorePickup
+        ? 'IN_STORE_RESERVE'
         : 'BANK_TRANSFER_EFT';
 
     const paymentEval = evaluatePaymentAttempt({
-      paymentMethod: chosenMethod,
+      paymentMethod: chosenMethod === 'PAYMENT_GATEWAY_IYZICO' ? 'PAYMENT_GATEWAY_IYZICO' : 'BANK_TRANSFER_EFT',
       amount: product.price,
     });
 
@@ -76,7 +80,9 @@ export async function POST(req: NextRequest) {
         customerName: String(customerName).trim(),
         customerPhone: String(customerPhone).trim(),
         customerEmail: String(customerEmail || '').trim(),
-        shippingAddress: String(shippingAddress).trim(),
+        shippingAddress: isInStorePickup
+          ? String(shippingAddress || 'Mağazadan Elden Teslim').trim()
+          : String(shippingAddress).trim(),
         amount: product.price,
         paymentMethod: chosenMethod,
         paymentStatus: paymentEval.status,
@@ -88,7 +94,9 @@ export async function POST(req: NextRequest) {
       success: true,
       orderNo: order.orderNo,
       paymentStatus: order.paymentStatus,
-      message: paymentEval.userMessage,
+      message: isInStorePickup
+        ? `Rezervasyon talebiniz alındı (${order.orderNo}). Mağazamızdan elden teslim için ekibimiz sizinle iletişime geçecektir.`
+        : paymentEval.userMessage,
     });
   } catch (error) {
     console.error('Store order creation error:', error);

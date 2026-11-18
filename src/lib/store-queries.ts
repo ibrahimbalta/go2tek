@@ -20,6 +20,8 @@ export interface StoreProductRecord {
   batteryHealth: string;
   images: string;
   videoUrl?: string | null;
+  shopierUrl?: string | null;
+  sahibindenUrl?: string | null;
   price: number;
   stockStatus: string;
   warrantyInfo: string;

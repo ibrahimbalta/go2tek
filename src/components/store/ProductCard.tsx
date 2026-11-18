@@ -23,6 +23,8 @@ export interface StoreProductItem {
   cosmeticCondition: string;
   batteryHealth: string;
   images: string;
+  shopierUrl?: string | null;
+  sahibindenUrl?: string | null;
   price: number;
   stockStatus: string;
   warrantyInfo: string;
@@ -142,6 +144,8 @@ export function ProductCard({ product }: { product: StoreProductItem }) {
                     price: product.price,
                     image: imageSrc,
                     cosmeticCondition: product.cosmeticCondition,
+                    shopierUrl: product.shopierUrl,
+                    sahibindenUrl: product.sahibindenUrl,
                   })
                 }
                 className={`w-10 h-10 rounded-full flex items-center justify-center shadow-xs transition ${
