@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getCurrentSession } from '@/lib/auth';
+import { sanitizeSafeUrl } from '@/lib/security';
 
 export async function PATCH(
   req: NextRequest,
@@ -71,7 +72,10 @@ export async function PATCH(
             : existing.technicalCheckSummary,
         images:
           body.imageUrl !== undefined
-            ? JSON.stringify([String(body.imageUrl).trim()])
+            ? JSON.stringify([
+                sanitizeSafeUrl(body.imageUrl) ||
+                  '/images/products/macbook-pro-14.svg',
+              ])
             : body.images !== undefined
             ? typeof body.images === 'string'
               ? body.images
@@ -79,21 +83,15 @@ export async function PATCH(
             : existing.images,
         videoUrl:
           body.videoUrl !== undefined
-            ? body.videoUrl
-              ? String(body.videoUrl).trim()
-              : null
+            ? sanitizeSafeUrl(body.videoUrl)
             : existing.videoUrl,
         shopierUrl:
           body.shopierUrl !== undefined
-            ? body.shopierUrl
-              ? String(body.shopierUrl).trim()
-              : null
+            ? sanitizeSafeUrl(body.shopierUrl, false)
             : existing.shopierUrl,
         sahibindenUrl:
           body.sahibindenUrl !== undefined
-            ? body.sahibindenUrl
-              ? String(body.sahibindenUrl).trim()
-              : null
+            ? sanitizeSafeUrl(body.sahibindenUrl, false)
             : existing.sahibindenUrl,
         isPublished:
           body.isPublished !== undefined

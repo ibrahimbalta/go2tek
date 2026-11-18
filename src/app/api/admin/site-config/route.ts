@@ -7,8 +7,13 @@ import {
   saveHeroSlides,
   saveSiteSettings,
 } from '@/lib/site-config';
+import { sanitizeSafeUrl } from '@/lib/security';
 
 export async function GET() {
+  const session = await getCurrentSession();
+  if (!session) {
+    return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
+  }
   const [siteSettings, heroSlides] = await Promise.all([
     getSiteSettings(),
     getHeroSlides(),
@@ -41,8 +46,25 @@ export async function PUT(req: NextRequest) {
       });
     }
 
-    if (body.heroSlides) {
-      await saveHeroSlides(body.heroSlides);
+    if (body.heroSlides && Array.isArray(body.heroSlides)) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const sanitizedSlides = body.heroSlides.map((s: any) => ({
+        ...s,
+        image: sanitizeSafeUrl(s.image) || '',
+        featuredCard: {
+          ...s.featuredCard,
+          href: sanitizeSafeUrl(s.featuredCard?.href) || '/magaza',
+        },
+        primaryCta: {
+          ...s.primaryCta,
+          href: sanitizeSafeUrl(s.primaryCta?.href) || '/magaza',
+        },
+        secondaryCta: {
+          ...s.secondaryCta,
+          href: sanitizeSafeUrl(s.secondaryCta?.href) || '/hakkimizda',
+        },
+      }));
+      await saveHeroSlides(sanitizedSlides);
 
       await prisma.auditLog.create({
         data: {

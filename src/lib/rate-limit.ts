@@ -11,6 +11,14 @@ export function checkRateLimit(
   windowMs: number = 60_000
 ): { allowed: boolean; remaining: number; retryAfterSeconds: number } {
   const now = Date.now();
+
+  // Prevent unbounded memory growth under heavy traffic
+  if (buckets.size > 2000) {
+    for (const [key, b] of buckets.entries()) {
+      if (now > b.resetAt) buckets.delete(key);
+    }
+  }
+
   const current = buckets.get(identifier);
 
   if (!current || now > current.resetAt) {

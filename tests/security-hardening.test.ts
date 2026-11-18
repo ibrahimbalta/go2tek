@@ -7,6 +7,8 @@ import {
   maskSerialNumber,
   sanitizeTrackingResponse,
   validateUploadedImageFile,
+  validateMediaMagicBytes,
+  sanitizeSafeUrl,
 } from '../src/lib/security';
 
 describe('Go2Tek Honest Payment & Deposit Rules', () => {
@@ -62,7 +64,6 @@ describe('Go2Tek Privacy, Serial Number Masking & File Upload Security', () => {
       status: 'MATCHED',
       currentTransactionStage: 'INSPECTION_IN_PROGRESS',
       createdAt: new Date('2026-11-17T10:00:00Z'),
-      // Sensitive fields that might exist in DB objects:
       fullName: 'Ahmet Yılmaz',
       phone: '05321112233',
       matchedSellerName: 'Mehmet Demir',
@@ -89,7 +90,7 @@ describe('Go2Tek Privacy, Serial Number Masking & File Upload Security', () => {
     const hugeFile = validateUploadedImageFile({
       fileName: 'photo.jpg',
       mimeType: 'image/jpeg',
-      sizeBytes: 8 * 1024 * 1024, // 8MB > 5MB limit
+      sizeBytes: 8 * 1024 * 1024,
     });
     expect(hugeFile.valid).toBe(false);
 
@@ -99,5 +100,30 @@ describe('Go2Tek Privacy, Serial Number Masking & File Upload Security', () => {
       sizeBytes: 420 * 1024,
     });
     expect(validWebp.valid).toBe(true);
+  });
+
+  it('rejects spoofed files whose binary magic bytes do not match image/video signatures', () => {
+    const fakeJpg = Buffer.from('PLAIN_TEXT_SPOOFED_IMAGE_BYTES', 'utf8');
+    expect(validateMediaMagicBytes(fakeJpg, false)).toBe(false);
+
+    const realPng = Buffer.from([
+      0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
+    ]);
+    expect(validateMediaMagicBytes(realPng, false)).toBe(true);
+
+    const realMp4 = Buffer.from([
+      0x00, 0x00, 0x00, 0x18, 0x66, 0x74, 0x79, 0x70, 0x6d, 0x70, 0x34, 0x32,
+    ]);
+    expect(validateMediaMagicBytes(realMp4, true)).toBe(true);
+  });
+
+  it('blocks javascript: and data: XSS URLs while allowing safe https and relative URLs', () => {
+    expect(sanitizeSafeUrl('javascript:alert(1)')).toBeNull();
+    expect(sanitizeSafeUrl('data:text/html,xss')).toBeNull();
+    expect(sanitizeSafeUrl('//evil.com/phish')).toBeNull();
+    expect(sanitizeSafeUrl('https://www.shopier.com/go2tek/123', false)).toBe(
+      'https://www.shopier.com/go2tek/123'
+    );
+    expect(sanitizeSafeUrl('/magaza/notebook')).toBe('/magaza/notebook');
   });
 });

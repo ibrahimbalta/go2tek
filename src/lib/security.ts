@@ -157,3 +157,78 @@ export function validateUploadedVideoFile(file: {
 
   return { valid: true };
 }
+
+/**
+ * Validates actual binary magic bytes so spoofed MIME/extensions cannot bypass upload security.
+ */
+export function validateMediaMagicBytes(
+  buffer: Buffer,
+  isVideo: boolean
+): boolean {
+  if (!buffer || buffer.length < 12) return false;
+
+  if (!isVideo) {
+    // JPEG: FF D8 FF
+    if (buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) {
+      return true;
+    }
+    // PNG: 89 50 4E 47 0D 0A 1A 0A
+    if (
+      buffer[0] === 0x89 &&
+      buffer[1] === 0x50 &&
+      buffer[2] === 0x4e &&
+      buffer[3] === 0x47
+    ) {
+      return true;
+    }
+    // WEBP: "RIFF" .... "WEBP"
+    if (
+      buffer.subarray(0, 4).toString('ascii') === 'RIFF' &&
+      buffer.subarray(8, 12).toString('ascii') === 'WEBP'
+    ) {
+      return true;
+    }
+    return false;
+  }
+
+  // MP4 / MOV: "ftyp" at offset 4
+  if (buffer.subarray(4, 8).toString('ascii') === 'ftyp') {
+    return true;
+  }
+  // WEBM / MKV: 1A 45 DF A3
+  if (
+    buffer[0] === 0x1a &&
+    buffer[1] === 0x45 &&
+    buffer[2] === 0xdf &&
+    buffer[3] === 0xa3
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Prevents javascript:, data:, vbscript: XSS payloads in user/admin-supplied URLs.
+ */
+export function sanitizeSafeUrl(
+  rawUrl: string | null | undefined,
+  allowRelative: boolean = true
+): string | null {
+  const clean = (rawUrl || '').trim();
+  if (!clean) return null;
+
+  if (allowRelative && clean.startsWith('/') && !clean.startsWith('//')) {
+    return clean;
+  }
+
+  try {
+    const parsed = new URL(clean);
+    if (parsed.protocol === 'https:' || parsed.protocol === 'http:') {
+      return parsed.toString();
+    }
+  } catch {
+    // invalid URL
+  }
+  return null;
+}

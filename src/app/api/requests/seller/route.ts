@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getCurrentSession } from '@/lib/auth';
 import { checkRateLimit } from '@/lib/rate-limit';
-import { maskSerialNumber } from '@/lib/security';
+import { maskSerialNumber, sanitizeSafeUrl } from '@/lib/security';
 
 // GET: Strictly restricted to authenticated Go2Tek Admin/Staff
 export async function GET() {
@@ -104,9 +104,12 @@ export async function POST(req: NextRequest) {
     const randomCode = Math.floor(1000 + Math.random() * 9000);
     const referenceNo = `G2T-SAT-2026-${randomCode}`;
 
-    const photoList = Array.isArray(photos) && photos.length > 0
-      ? photos
-      : ['/images/products/macbook-pro-14.svg'];
+    const photoList =
+      Array.isArray(photos) && photos.length > 0
+        ? photos
+            .map((p: string) => sanitizeSafeUrl(p))
+            .filter((p): p is string => Boolean(p))
+        : ['/images/products/macbook-pro-14.svg'];
 
     const created = await prisma.sellerOffer.create({
       data: {
@@ -125,8 +128,12 @@ export async function POST(req: NextRequest) {
         cosmeticCondition: String(cosmeticCondition || 'A'),
         batteryHealth: String(batteryHealth || '%90+').trim(),
         knownDefects: String(knownDefects || 'Bilinen arıza yok').trim(),
-        photos: JSON.stringify(photoList),
-        videoUrl: videoUrl ? String(videoUrl).trim() : null,
+        photos: JSON.stringify(
+          photoList.length > 0
+            ? photoList
+            : ['/images/products/macbook-pro-14.svg']
+        ),
+        videoUrl: sanitizeSafeUrl(videoUrl),
         requestedPrice: parsedPrice,
         fullName: String(fullName).trim(),
         phone: String(phone).trim(),

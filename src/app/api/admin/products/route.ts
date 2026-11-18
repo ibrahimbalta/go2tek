@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getCurrentSession } from '@/lib/auth';
+import { sanitizeSafeUrl } from '@/lib/security';
 
 export async function POST(req: NextRequest) {
   try {
@@ -77,11 +78,11 @@ export async function POST(req: NextRequest) {
         cosmeticCondition: String(cosmeticCondition || 'A_PLUS'),
         batteryHealth: String(batteryHealth || '%95').trim(),
         images: JSON.stringify([
-          imageUrl || '/images/products/macbook-pro-14.svg',
+          sanitizeSafeUrl(imageUrl) || '/images/products/macbook-pro-14.svg',
         ]),
-        videoUrl: videoUrl ? String(videoUrl).trim() : null,
-        shopierUrl: shopierUrl ? String(shopierUrl).trim() : null,
-        sahibindenUrl: sahibindenUrl ? String(sahibindenUrl).trim() : null,
+        videoUrl: sanitizeSafeUrl(videoUrl),
+        shopierUrl: sanitizeSafeUrl(shopierUrl, false),
+        sahibindenUrl: sanitizeSafeUrl(sahibindenUrl, false),
         price: Number(price),
         stockStatus: String(stockStatus || 'IN_STOCK'),
         warrantyInfo: String(

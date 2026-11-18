@@ -11,8 +11,8 @@ import { checkRateLimit } from '@/lib/rate-limit';
 export async function POST(req: NextRequest) {
   try {
     const ip = req.headers.get('x-forwarded-for') || '127.0.0.1';
-    const rate = checkRateLimit(`admin-login:${ip}`, 10, 60_000);
-    if (!rate.allowed) {
+    const ipRate = checkRateLimit(`admin-login-ip:${ip}`, 10, 60_000);
+    if (!ipRate.allowed) {
       return NextResponse.json(
         { error: 'Çok fazla giriş denemesi yapıldı. Lütfen 1 dakika bekleyin.' },
         { status: 429 }
@@ -20,18 +20,48 @@ export async function POST(req: NextRequest) {
     }
 
     const { email, password } = await req.json();
-    if (!email || !password) {
+    const cleanEmail = String(email || '').trim().toLowerCase();
+    if (!cleanEmail || !password) {
       return NextResponse.json(
         { error: 'E-posta ve şifre zorunludur.' },
         { status: 400 }
       );
     }
 
+    const accountRate = checkRateLimit(
+      `admin-login-acct:${ip}:${cleanEmail}`,
+      5,
+      5 * 60_000
+    );
+    if (!accountRate.allowed) {
+      return NextResponse.json(
+        {
+          error:
+            'Güvenlik nedeniyle bu hesap için giriş geçici olarak kilitlendi. 5 dakika sonra tekrar deneyin.',
+        },
+        { status: 429 }
+      );
+    }
+
     const user = await prisma.user.findUnique({
-      where: { email: String(email).trim().toLowerCase() },
+      where: { email: cleanEmail },
     });
 
     if (!user || !user.isActive || !verifyPassword(String(password), user.passwordHash)) {
+      await prisma.auditLog
+        .create({
+          data: {
+            userEmail: cleanEmail,
+            userRole: 'UNKNOWN',
+            action: 'LOGIN_FAILED',
+            entityType: 'User',
+            entityId: user?.id || 'UNKNOWN',
+            details: `Başarısız yönetim girişi denemesi (${cleanEmail}).`,
+            ipAddress: ip,
+          },
+        })
+        .catch(() => {});
+
       return NextResponse.json(
         { error: 'Geçersiz yönetici/personel e-postası veya şifre.' },
         { status: 401 }
@@ -68,6 +98,7 @@ export async function POST(req: NextRequest) {
     res.cookies.set(AUTH_COOKIE_NAME, token, {
       httpOnly: true,
       sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
       path: '/',
       maxAge: 60 * 60 * 12,
     });

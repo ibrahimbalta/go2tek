@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import {
   validateUploadedImageFile,
   validateUploadedVideoFile,
+  validateMediaMagicBytes,
 } from '@/lib/security';
 import { checkRateLimit } from '@/lib/rate-limit';
 import crypto from 'crypto';
@@ -47,6 +48,16 @@ export async function POST(req: NextRequest) {
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
+    if (!validateMediaMagicBytes(buffer, isVideo)) {
+      return NextResponse.json(
+        {
+          error:
+            'Dosya içeriği geçerli bir görsel veya video formatıyla eşleşmiyor.',
+        },
+        { status: 400 }
+      );
+    }
+
     const ext =
       path.extname(file.name).toLowerCase() || (isVideo ? '.mp4' : '.jpg');
     const safeFileName = `${isVideo ? 'video' : 'device'}-${crypto.randomUUID()}${ext}`;
