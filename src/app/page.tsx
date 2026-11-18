@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { ProductCard } from '@/components/store/ProductCard';
 import { HeroSlider } from '@/components/home/HeroSlider';
+import { AboutSection } from '@/components/home/AboutSection';
 import { getHeroSlides, getSiteSettings } from '@/lib/site-config';
 import { getPublishedProducts } from '@/lib/store-queries';
 import {
@@ -172,6 +173,9 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
+
+      {/* 4.5. About Go2Tek (Bartın Story & Store Portrait) */}
+      <AboutSection />
 
       {/* 5. Clean, Realistic Info Banner */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
